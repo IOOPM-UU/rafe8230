@@ -9,20 +9,18 @@ int main(void)
     // int number = rand() % 1024;
 
     int number = 100;
-    int buf_size = 255;
-    char buf[buf_size]; 
 
     char *name;
 
-    name = ask_question_string("What is your name?", buf, buf_size);
-    printf("%s, I'm thinking of a number, can you guess what it is?", name); 
+    name = ask_question_string("What is your name?   ");
+    printf("%s, I'm thinking of a number, can you guess what it is?\n", name); 
 
     bool gameloop = true;
     int guesses = 0;
 
     while (gameloop)
     {
-        int answer = ask_question_int("Enter a number: ");
+        int answer = ask_question_int("Enter a number:   ");
 
         if(guesses > 15)
         {
@@ -33,8 +31,8 @@ int main(void)
         if (answer == number)
         {
             guesses++;
-            printf("Bingo!\n\n");
-            printf("it took %s %d guesses to arrive at %d ", name, guesses, number); 
+            printf("\n\nBingo!\n\n");
+            printf("it took %s %d guesses to arrive at %d \n", name, guesses, number); 
             gameloop = false;
             break;
             

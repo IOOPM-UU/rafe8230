@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+*.o
+*.exe
+hash_table_tests
+unit_tests
