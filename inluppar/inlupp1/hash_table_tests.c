@@ -1,6 +1,6 @@
 #include <CUnit/Basic.h>
 #include "hash_table.h"
-
+#include <stdbool.h>
 
 int init_suite(void) {
   // Change this function if you want to do something *before* you
@@ -19,6 +19,29 @@ void test_create_destroy(void)
    ioopm_hash_table_t *ht = ioopm_hash_table_create();
    CU_ASSERT_PTR_NOT_NULL(ht);
    ioopm_hash_table_destroy(ht);
+}
+
+
+void test_insert_once(void)
+{
+  // create new hash table
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key = "abc";
+  int value = 123;
+
+  // check that key is not in ht
+  int result = 0;
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 0);
+
+  // insert key-value pair and check that the mapping exists
+  ioopm_hash_table_insert(ht, key, value);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value);
+
+  // destroy hash table
+  ioopm_hash_table_destroy(ht);
 }
 
 int main(void)
@@ -40,6 +63,7 @@ int main(void)
 
      if (
     (CU_add_test(my_test_suite, "create and destroy", test_create_destroy) == NULL) ||
+    (CU_add_test(my_test_suite, "Insert once", test_insert_once) == NULL) ||
     0
   )
     {
