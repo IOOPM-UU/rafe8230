@@ -44,6 +44,134 @@ void test_insert_once(void)
   ioopm_hash_table_destroy(ht);
 }
 
+// Remove the first element of a linked list of size two
+void test_remove_entry_first(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  
+  char *key1 = "a";
+  int value1 = 1; 
+  ioopm_hash_table_insert(ht, key1, value1);
+
+  char *key2 = "r";
+  int value2 = 2;
+  ioopm_hash_table_insert(ht, key2, value2);
+  
+  // insert key-value linked list and check that the mapping exsits
+  int result = 0; 
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1);
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, value2);
+
+
+  // remove the value and check if the correct value got removed
+  CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1);
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key1, &result));
+
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, value2); 
+
+  ioopm_hash_table_destroy(ht);
+}
+
+// Remove the midlle most element
+void test_remove_entry_middle(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  
+  char *key1 = "a";
+  int value1 = 1; 
+  ioopm_hash_table_insert(ht, key1, value1);
+
+  char *key2 = "r";
+  int value2 = 2;
+  ioopm_hash_table_insert(ht, key2, value2);
+
+  char *key3 = "at";
+  int value3 = 3;
+  ioopm_hash_table_insert(ht, key3, value3);
+
+  
+  // insert key-value linked list and check that the mapping exsits
+  int result = 0; 
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1);
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, value2);
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key3, &result));
+  CU_ASSERT_EQUAL(result, value3);
+
+  // remove the value and check if the correct value got removed
+  CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, value2);
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key2, &result));
+
+  // check if other entries are still there
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1); 
+
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key3, &result));
+  CU_ASSERT_EQUAL(result, value3); 
+
+  ioopm_hash_table_destroy(ht);
+}
+
+// Remove the last element of a linked list of size two
+void test_remove_entry_last(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  
+  char *key1 = "a";
+  int value1 = 1; 
+  ioopm_hash_table_insert(ht, key1, value1);
+
+  char *key2 = "r";
+  int value2 = 2;
+  ioopm_hash_table_insert(ht, key2, value2);
+  
+  // insert key-value linked list and check that the mapping exsits
+  int result = 0; 
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1);
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, value2);
+
+
+  // remove the value and check if the correct value got removed
+  CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, value2);
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key2, &result));
+
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1); 
+
+  ioopm_hash_table_destroy(ht);
+}
+
+// Try to remove an element in an empty table
+void test_remove_entry_empty_table(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  char *key = "a";
+  
+  int result = 0; 
+
+  // Check if key exsists in ht
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  
+  // Try to remove that key
+  CU_ASSERT_FALSE(ioopm_hash_table_remove(ht, key, &result));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+
 int main(void)
 {
     // First we try to set up CUnit, and exit if we fail
@@ -64,6 +192,10 @@ int main(void)
      if (
     (CU_add_test(my_test_suite, "create and destroy", test_create_destroy) == NULL) ||
     (CU_add_test(my_test_suite, "Insert once", test_insert_once) == NULL) ||
+    (CU_add_test(my_test_suite, "Remove: first entry", test_remove_entry_first) == NULL) ||
+    (CU_add_test(my_test_suite, "Remove: last entry", test_remove_entry_last) == NULL) ||
+    (CU_add_test(my_test_suite, "Remove: middle entry", test_remove_entry_middle) == NULL) ||
+    (CU_add_test(my_test_suite, "Remove: no entries", test_remove_entry_empty_table) == NULL) ||
     0
   )
     {

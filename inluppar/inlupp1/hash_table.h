@@ -15,9 +15,20 @@
 
 typedef struct hash_table ioopm_hash_table_t;
 
+typedef struct entry entry_t; 
+
+struct entry
+{
+  char *key;     // holds the key
+  int value;     // holds the value
+  entry_t *next; // points to the next entry (possibly NULL)
+};
+
 /// @brief Create a new hash table
 /// @return A new empty hash table
 ioopm_hash_table_t *ioopm_hash_table_create(void);
+
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result);
 
 /// @brief Delete a hash table and free its memory
 /// @param ht a hash table to be deleted
@@ -39,4 +50,3 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result);
 /// @param ht hash table operated upon
 /// @param key key to remove
 /// @return the value mapped to by key (FIXME: what if the key does not exist?)
-int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key);

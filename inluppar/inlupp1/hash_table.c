@@ -5,14 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-typedef struct entry entry_t; 
 
-struct entry
-{
-  char *key;     // holds the key
-  int value;     // holds the value
-  entry_t *next; // points to the next entry (possibly NULL)
-};
 
 struct hash_table
 {
@@ -40,10 +33,9 @@ ioopm_hash_table_t *ioopm_hash_table_create(void) {
     return calloc(1, sizeof(ioopm_hash_table_t));
 }
 
-static entry_t *entry_create(char *key, int value, entry_t *next)
+static entry_t *ioopm_entry_create(char *key, int value, entry_t *next)
 {
-    entry_t *entry;
-    entry = malloc(sizeof(entry_t));
+    entry_t *entry = calloc(1, sizeof(entry_t));
     entry->key = key;
     entry->value = value;
     entry->next = next;
@@ -51,21 +43,15 @@ static entry_t *entry_create(char *key, int value, entry_t *next)
     return entry; 
 }
 
-static entry_t *entry_destroy(entry_t *entry)
-{
-  // TODO: Stub
-    (void) entry; 
-  return NULL;
-}
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
- 
+    
     for (int i = 0; i < 17; i++)
     {
-        entry_t *current = &ht->buckets[i];
+        entry_t *current = ht->buckets[i].next;
         while (current != NULL)
         {
-
+            
             entry_t *next = current->next;
             free(current); 
             current = next; 
@@ -73,23 +59,51 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     }
     
     free(ht);
- return;
+    return;
 }
 
 entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key)
 {
     // find bucket
-  size_t bucket = string_knr_hash(key) % 17;
+    size_t bucket = string_knr_hash(key) % 17;
+    
+    // look for an entry with the key we want
+    entry_t *previous = &ht->buckets[bucket];
+    entry_t *current = previous->next;
+    while (current != NULL && strcmp(current->key, key) != 0)
+    {
+        previous = current;
+        current = current->next;
+    }
+    return previous; 
+}
 
-  // look for an entry with the key we want
-  entry_t *previous = &ht->buckets[bucket];
-  entry_t *current = previous->next;
-  while (current != NULL && strcmp(current->key, key) != 0)
-  {
-    previous = current;
-    current = current->next;
-  }
-  return previous; 
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result)
+{
+    entry_t *previous = find_previous_entry(ht, key);
+    entry_t *current = previous->next;
+
+    
+    while (current != NULL)
+    {
+
+        if (strcmp(key, current->key) == 0)
+        {
+
+            // case : no middle element and is last element
+            previous->next = current->next;
+            *result = current->value; 
+            free(current);
+            return true;
+        } else 
+        {
+            previous = current; 
+            current = current->next; 
+        }
+    }
+    
+    // the bucket is empty or key is not in bucket
+    return false;
 }
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
@@ -104,7 +118,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
   }
   else
   {
-    previous->next = entry_create(key, value, NULL);
+    previous->next = ioopm_entry_create(key, value, NULL);
   }
 }
 
