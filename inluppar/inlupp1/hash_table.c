@@ -35,6 +35,12 @@ static ioopm_entry_t *ioopm_entry_create(char *key, int value, ioopm_entry_t *ne
     return entry; 
 }
 
+static ioopm_entry_t *entry_destroy(ioopm_entry_t *entry)
+{
+  ioopm_entry_t *next = entry->next;
+  free(entry);
+  return next;
+}
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     
@@ -43,10 +49,7 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
         ioopm_entry_t *current = ht->buckets[i].next;
         while (current != NULL)
         {
-            
-            ioopm_entry_t *next = current->next;
-            free(current); 
-            current = next; 
+            current = entry_destroy(current);
         }
     }
     
@@ -82,10 +85,9 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result)
         if (strcmp(key, current->key) == 0)
         {
 
-            // case : no middle element and is last element
-            previous->next = current->next;
-            *result = current->value; 
-            free(current);
+            // case : no middle element and is last elementx
+            *result = current->value;
+            previous->next = entry_destroy(current);
             return true;
         } else 
         {
@@ -95,6 +97,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result)
     }
     
     // the bucket is empty or key is not in bucket
+    *result = 0; 
     return false;
 }
 
@@ -127,6 +130,7 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
     }
     else
     {
+        *result = 0; 
         return false;
     }
 }

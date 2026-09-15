@@ -21,6 +21,61 @@ void test_create_destroy(void)
    ioopm_hash_table_destroy(ht);
 }
 
+void test_create_destroy_destroy_with_entries(void)
+{
+   ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+     
+  char *key1 = "a";
+  int value1 = 1; 
+  ioopm_hash_table_insert(ht, key1, value1);
+
+  char *key2 = "r";
+  int value2 = 2;
+  ioopm_hash_table_insert(ht, key2, value2);
+
+  char *key3 = "at";
+  int value3 = 3;
+  ioopm_hash_table_insert(ht, key3, value3);
+
+  ioopm_hash_table_destroy(ht); 
+  // If no mem leaks, then this function is working
+}
+
+void test_lookup_entry_exsist(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  char *key = "a";
+  int value = 123;
+
+  int result = 0; 
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 0);
+  
+  ioopm_hash_table_insert(ht, key, value);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 123); 
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_lookup_entry_no_exsist(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  char *key_dummy = "a";
+  int value_dummy = 1;
+  char *key = "b";
+  
+  int result = 0; 
+  ioopm_hash_table_insert(ht, key_dummy, value_dummy);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key_dummy, &result));
+  CU_ASSERT_EQUAL(result, value_dummy);
+
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 0); 
+
+  ioopm_hash_table_destroy(ht);
+}
 
 void test_insert_once(void)
 {
@@ -43,6 +98,7 @@ void test_insert_once(void)
   // destroy hash table
   ioopm_hash_table_destroy(ht);
 }
+
 void test_insert_twice_same(void)
 {
   // create new hash table
@@ -97,7 +153,9 @@ void test_remove_entry_first(void)
   // remove the value and check if the correct value got removed
   CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key1, &result));
   CU_ASSERT_EQUAL(result, value1);
+
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, 0); 
 
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key2, &result));
   CU_ASSERT_EQUAL(result, value2); 
@@ -137,7 +195,9 @@ void test_remove_entry_middle(void)
   // remove the value and check if the correct value got removed
   CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key2, &result));
   CU_ASSERT_EQUAL(result, value2);
+
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, 0); 
 
   // check if other entries are still there
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key1, &result));
@@ -168,15 +228,17 @@ void test_remove_entry_one(void)
   CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key1, &result));
   CU_ASSERT_EQUAL(result, value1);
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, 0);
 
   ioopm_hash_table_destroy(ht);
 }
+
 
 // Remove the last element of a linked list of size two
 void test_remove_entry_last(void)
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
-  
+
   char *key1 = "a";
   int value1 = 1; 
   ioopm_hash_table_insert(ht, key1, value1);
@@ -197,7 +259,9 @@ void test_remove_entry_last(void)
   // remove the value and check if the correct value got removed
   CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key2, &result));
   CU_ASSERT_EQUAL(result, value2);
+
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, 0);
 
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key1, &result));
   CU_ASSERT_EQUAL(result, value1); 
@@ -215,14 +279,42 @@ void test_remove_entry_empty_table(void)
 
   // Check if key exsists in ht
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 0);
   
   // Try to remove that key
   CU_ASSERT_FALSE(ioopm_hash_table_remove(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 0);
 
   ioopm_hash_table_destroy(ht);
 }
 
+void test_remove_missing_key_filled_table(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  
+  char *key_missing = "a";
 
+  char *key2 = "r";
+  int value2 = 2;
+  ioopm_hash_table_insert(ht, key2, value2);
+
+  char *key3 = "at";
+  int value3 = 3;
+  ioopm_hash_table_insert(ht, key3, value3);
+
+  // Try remove with missing key
+  int result = 0; 
+  CU_ASSERT_FALSE(ioopm_hash_table_remove(ht, key_missing, &result));
+  CU_ASSERT_EQUAL(result, 0); 
+
+  // Check for survivors
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, value2);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key3, &result));
+  CU_ASSERT_EQUAL(result, value3);
+
+  ioopm_hash_table_destroy(ht); 
+}
 int main(void)
 {
     // First we try to set up CUnit, and exit if we fail
@@ -242,12 +334,15 @@ int main(void)
 
      if (
     (CU_add_test(my_test_suite, "create and destroy", test_create_destroy) == NULL) ||
-    (CU_add_test(my_test_suite, "Insert once", test_insert_once) == NULL) ||
+    (CU_add_test(my_test_suite, "Insert: one key", test_insert_once) == NULL) ||
+    (CU_add_test(my_test_suite, "Insert: Same key twice", test_insert_twice_same) == NULL) ||
     (CU_add_test(my_test_suite, "Remove: first entry", test_remove_entry_first) == NULL) ||
     (CU_add_test(my_test_suite, "Remove: last entry", test_remove_entry_last) == NULL) ||
     (CU_add_test(my_test_suite, "Remove: middle entry", test_remove_entry_middle) == NULL) ||
     (CU_add_test(my_test_suite, "Remove: no entries", test_remove_entry_empty_table) == NULL) ||
     (CU_add_test(my_test_suite, "Remove: only one entry", test_remove_entry_one) == NULL) ||
+    (CU_add_test(my_test_suite, "Lookup: Entry exits", test_lookup_entry_exsist) == NULL) ||
+    (CU_add_test(my_test_suite, "Lookup: Entry does not exist", test_lookup_entry_no_exsist) == NULL) ||
     0
   )
     {
