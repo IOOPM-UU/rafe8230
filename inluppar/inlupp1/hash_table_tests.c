@@ -43,6 +43,34 @@ void test_insert_once(void)
   // destroy hash table
   ioopm_hash_table_destroy(ht);
 }
+void test_insert_twice_same(void)
+{
+  // create new hash table
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key = "abc";
+  int value = 123;
+  char *key_dup = "abc";
+  int value_dup = 543;
+
+  // check that key is not in ht
+  int result = 0;
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 0);
+  
+
+  // insert key-value pair and check that the mapping exists
+  ioopm_hash_table_insert(ht, key, value);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value);
+
+  ioopm_hash_table_insert(ht, key_dup, value_dup);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key_dup, &result));
+  CU_ASSERT_EQUAL(result, value_dup); 
+
+  // destroy hash table
+  ioopm_hash_table_destroy(ht);
+}
 
 // Remove the first element of a linked list of size two
 void test_remove_entry_first(void)
