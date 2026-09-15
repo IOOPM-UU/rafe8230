@@ -122,6 +122,29 @@ void test_remove_entry_middle(void)
 }
 
 // Remove the last element of a linked list of size two
+void test_remove_entry_one(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  
+  char *key1 = "a";
+  int value1 = 1; 
+  ioopm_hash_table_insert(ht, key1, value1);
+  
+  // insert key-value linked list and check that the mapping exsits
+  int result = 0; 
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1);
+
+
+  // remove the value and check if the correct value got removed
+  CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1);
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key1, &result));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+// Remove the last element of a linked list of size two
 void test_remove_entry_last(void)
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
@@ -196,6 +219,7 @@ int main(void)
     (CU_add_test(my_test_suite, "Remove: last entry", test_remove_entry_last) == NULL) ||
     (CU_add_test(my_test_suite, "Remove: middle entry", test_remove_entry_middle) == NULL) ||
     (CU_add_test(my_test_suite, "Remove: no entries", test_remove_entry_empty_table) == NULL) ||
+    (CU_add_test(my_test_suite, "Remove: only one entry", test_remove_entry_one) == NULL) ||
     0
   )
     {
