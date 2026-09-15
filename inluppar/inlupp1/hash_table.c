@@ -5,15 +5,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-
-
-struct hash_table
-{
-  // DODGE: hard-coding number of buckets as 17.
-  // NOTE: addressing this dodge is optional.
-  entry_t buckets[17];
-};
-
+#define No_Buckets 17
 
 static size_t string_knr_hash(const char *str)
 {
@@ -33,9 +25,9 @@ ioopm_hash_table_t *ioopm_hash_table_create(void) {
     return calloc(1, sizeof(ioopm_hash_table_t));
 }
 
-static entry_t *ioopm_entry_create(char *key, int value, entry_t *next)
+static ioopm_entry_t *ioopm_entry_create(char *key, int value, ioopm_entry_t *next)
 {
-    entry_t *entry = calloc(1, sizeof(entry_t));
+    ioopm_entry_t *entry = calloc(1, sizeof(ioopm_entry_t));
     entry->key = key;
     entry->value = value;
     entry->next = next;
@@ -46,13 +38,13 @@ static entry_t *ioopm_entry_create(char *key, int value, entry_t *next)
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < No_Buckets; i++)
     {
-        entry_t *current = ht->buckets[i].next;
+        ioopm_entry_t *current = ht->buckets[i].next;
         while (current != NULL)
         {
             
-            entry_t *next = current->next;
+            ioopm_entry_t *next = current->next;
             free(current); 
             current = next; 
         }
@@ -62,14 +54,14 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     return;
 }
 
-entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key)
+ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, char *key)
 {
     // find bucket
-    size_t bucket = string_knr_hash(key) % 17;
+    size_t bucket = string_knr_hash(key) % No_Buckets;
     
     // look for an entry with the key we want
-    entry_t *previous = &ht->buckets[bucket];
-    entry_t *current = previous->next;
+    ioopm_entry_t *previous = &ht->buckets[bucket];
+    ioopm_entry_t *current = previous->next;
     while (current != NULL && strcmp(current->key, key) != 0)
     {
         previous = current;
@@ -80,8 +72,8 @@ entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key)
 
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result)
 {
-    entry_t *previous = find_previous_entry(ht, key);
-    entry_t *current = previous->next;
+    ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
+    ioopm_entry_t *current = previous->next;
 
     
     while (current != NULL)
@@ -109,7 +101,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result)
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
 {
   // find previous entry, or the last entry if the key does not exist
-  entry_t *previous = find_previous_entry(ht, key);
+  ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
 
   // if the key exists, update the value, otherwise create a new entry
   if (previous->next != NULL)
@@ -124,8 +116,8 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
 
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
 {
-    entry_t *previous = find_previous_entry(ht, key); 
-    entry_t *current = previous->next; 
+    ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key); 
+    ioopm_entry_t *current = previous->next; 
 
     // if the key exists, return the value, otherwise, indicate that the lookup failed
     if (current != NULL)

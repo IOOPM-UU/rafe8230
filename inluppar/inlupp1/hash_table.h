@@ -13,16 +13,24 @@
 *
 */
 
-typedef struct hash_table ioopm_hash_table_t;
-
-typedef struct entry entry_t; 
+typedef struct entry ioopm_entry_t;
 
 struct entry
 {
   char *key;     // holds the key
   int value;     // holds the value
-  entry_t *next; // points to the next entry (possibly NULL)
+  ioopm_entry_t *next; // points to the next entry (possibly NULL)
 };
+
+typedef struct hash_table ioopm_hash_table_t;
+
+struct hash_table
+{
+  // DODGE: hard-coding number of buckets as 17.
+  // NOTE: addressing this dodge is optional.
+  ioopm_entry_t buckets[17];
+};
+
 
 /// @brief Create a new hash table
 /// @return A new empty hash table
