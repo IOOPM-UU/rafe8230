@@ -1,6 +1,7 @@
 #include <CUnit/Basic.h>
 #include "hash_table.h"
 #include <stdbool.h>
+#include <assert.h>
 
 int init_suite(void) {
   // Change this function if you want to do something *before* you

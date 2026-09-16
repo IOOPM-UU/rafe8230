@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "hash_table_private.h"
 
-#define No_Buckets 17
 
 static size_t string_knr_hash(const char *str)
 {
