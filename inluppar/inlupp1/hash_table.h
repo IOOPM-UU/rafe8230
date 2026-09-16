@@ -29,10 +29,11 @@ struct hash_table
   // DODGE: hard-coding number of buckets as 17.
   // NOTE: addressing this dodge is optional.
   ioopm_entry_t buckets[17];
+  int ioopm_table_size;
 };
 
 
-/// @brief Create a new hash table
+/// @brief Create a new hash table with size 0
 /// @return A new empty hash table
 ioopm_hash_table_t *ioopm_hash_table_create(void);
 
@@ -58,3 +59,12 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result);
 /// @param ht hash table operated upon
 /// @param key key to remove
 /// @return the value mapped to by key (FIXME: what if the key does not exist?)
+
+// TODO: documentation
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key);
+
+// TODO: documentation
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
+
+// TODO: documentation
+int ioopm_hash_table_size(ioopm_hash_table_t *ht);

@@ -22,7 +22,9 @@ ioopm_hash_table_t *ioopm_hash_table_create(void) {
     // NOTE: Calloc initializes all bits to 0.
     // We therefore do not have to create a loop
     // setting all the buckets to NULL
-    return calloc(1, sizeof(ioopm_hash_table_t));
+    ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
+    ht->ioopm_table_size = 0; 
+    return ht;
 }
 
 static ioopm_entry_t *ioopm_entry_create(char *key, int value, ioopm_entry_t *next)
@@ -88,6 +90,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result)
             // case : no middle element and is last elementx
             *result = current->value;
             previous->next = entry_destroy(current);
+            ht->ioopm_table_size--;
             return true;
         } else 
         {
@@ -114,6 +117,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
   else
   {
     previous->next = ioopm_entry_create(key, value, NULL);
+    ht->ioopm_table_size++; 
   }
 }
 
@@ -134,3 +138,24 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
         return false;
     }
 }
+
+
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key)
+{
+    int result = 0; 
+    return ioopm_hash_table_lookup(ht, key, &result); 
+}
+
+int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+{
+    
+    return ht->ioopm_table_size;
+}
+
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
+{
+    
+    return ht->ioopm_table_size == 0;
+}
+
+

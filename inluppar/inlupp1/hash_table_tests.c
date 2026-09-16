@@ -315,6 +315,191 @@ void test_remove_missing_key_filled_table(void)
 
   ioopm_hash_table_destroy(ht); 
 }
+
+// if we dont find key, set result to 0
+// if we find key, set result to the keys value
+
+void test_has_key_empty_table(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key = "a"; 
+
+
+  CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, key));
+
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_has_key(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key = "a"; 
+  int value = 1;
+  ioopm_hash_table_insert(ht, key, value);
+
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_has_multiple_keys(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key1 = "a"; 
+  int value1 = 1;
+  ioopm_hash_table_insert(ht, key1, value1);
+
+
+  char *key2 = "b"; 
+  int value2 = 2;
+  ioopm_hash_table_insert(ht, key2, value2);
+
+
+  char *key3 = "c"; 
+  int value3 = 3;
+  ioopm_hash_table_insert(ht, key3, value3);
+  
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key1));
+
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key2));
+
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key3));
+
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_insert_remove_check_key(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key = "a"; 
+  int value = 1;
+  ioopm_hash_table_insert(ht, key, value);
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key));
+  
+  int result = 0;
+  CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key, &result));
+  CU_ASSERT_EQUAL(result, value); 
+
+  CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, key)); 
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_key_insert_three_remove_one(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key1 = "a"; 
+  int value1 = 1;
+  ioopm_hash_table_insert(ht, key1, value1);
+
+
+  char *key2 = "b"; 
+  int value2 = 2;
+  ioopm_hash_table_insert(ht, key2, value2);
+
+
+  char *key3 = "c"; 
+  int value3 = 3;
+  ioopm_hash_table_insert(ht, key3, value3);
+  
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key1));
+
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key2));
+
+
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key3));
+  
+  int result = 0; 
+  CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key2, &result));
+  CU_ASSERT_EQUAL(result, value2);
+  
+  CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, key2));
+  
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key1));
+  
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, key3));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_empty_table_size(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0); 
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_table_size_one(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char *key = "a"; 
+  int value = 0; 
+  ioopm_hash_table_insert(ht, key, value); 
+
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 1);
+
+  ioopm_hash_table_destroy(ht); 
+}
+
+void test_table_size_large(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char keys[50][8]; 
+  int i = 0;
+  for (; i < 50; i++)
+  {
+    snprintf(keys[i], sizeof(keys[i]), "key%d", i); 
+    ioopm_hash_table_insert(ht, keys[i], i);
+  }
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), i); 
+
+  ioopm_hash_table_destroy(ht); 
+}
+
+void test_table_size_remove(void)
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+
+  char *key1 = "a"; 
+  char *key2 = "b";
+
+  int value1 = 1;
+  int value2 = 2;
+
+  ioopm_hash_table_insert(ht, key1, value1);
+  ioopm_hash_table_insert(ht, key2, value2); 
+
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 2); 
+  int result = 0;
+  CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key1, &result));
+  CU_ASSERT_EQUAL(result, value1); 
+
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 1); 
+
+  ioopm_hash_table_destroy(ht); 
+}
+
+
 int main(void)
 {
     // First we try to set up CUnit, and exit if we fail
@@ -343,6 +528,15 @@ int main(void)
     (CU_add_test(my_test_suite, "Remove: only one entry", test_remove_entry_one) == NULL) ||
     (CU_add_test(my_test_suite, "Lookup: Entry exits", test_lookup_entry_exsist) == NULL) ||
     (CU_add_test(my_test_suite, "Lookup: Entry does not exist", test_lookup_entry_no_exsist) == NULL) ||
+    (CU_add_test(my_test_suite, "Has key: Key exist", test_has_key) == NULL) ||
+    (CU_add_test(my_test_suite, "Has key: Table is empty", test_has_key_empty_table) == NULL) ||
+    (CU_add_test(my_test_suite, "Has key: Multiple keys in table", test_has_multiple_keys) == NULL) ||
+    (CU_add_test(my_test_suite, "Has key: Insert multiple - remove one", test_key_insert_three_remove_one) == NULL) ||
+    (CU_add_test(my_test_suite, "Has key: Insert and remove same key", test_insert_remove_check_key) == NULL) ||
+    (CU_add_test(my_test_suite, "Size: empty table", test_empty_table_size) == NULL) ||
+    (CU_add_test(my_test_suite, "Size: one entry", test_table_size_one) == NULL) ||
+    (CU_add_test(my_test_suite, "Size: Large table", test_table_size_large) == NULL) ||
+    (CU_add_test(my_test_suite, "Size: size after removing element", test_table_size_remove) == NULL) ||
     0
   )
     {
