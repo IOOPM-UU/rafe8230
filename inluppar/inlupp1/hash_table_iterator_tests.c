@@ -35,11 +35,8 @@ void test_iterate_table_size_one(void)
     ioopm_hash_table_insert(ht, key, value);
 
     ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
-
-
-    ioopm_hash_table_iterator_advance(it);
-
-    CU_ASSERT_TRUE(strcmp(ioopm_hash_table_iterator_current_key(it), key));
+    
+    CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it), key);
 
     CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it), value);
 
@@ -61,14 +58,18 @@ void test_iterate_table_size_mulitple(void)
         ioopm_hash_table_insert(ht, keys[i], i);
     }
 
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), No_Buckets);
+
+
     ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
     int counter = 0;
     while (!ioopm_hash_table_iterator_at_end(it))
     {
-        ioopm_hash_table_iterator_advance(it); 
-        counter++;
-    }
 
+        counter++;
+        ioopm_hash_table_iterator_advance(it); 
+    }
+     
     CU_ASSERT_EQUAL(counter, No_Buckets);
     ioopm_hash_table_iterator_destroy(it);  
     ioopm_hash_table_destroy(ht);
@@ -111,7 +112,7 @@ void test_iterate_table_multiple_checks(void)
         counter++;
     }
 
-    CU_ASSERT_EQUAL(counter, No_Buckets);
+    CU_ASSERT_EQUAL(counter, 20);
     ioopm_hash_table_iterator_destroy(it);  
     ioopm_hash_table_destroy(ht);
 }
