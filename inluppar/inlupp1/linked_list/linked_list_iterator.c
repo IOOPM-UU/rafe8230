@@ -68,14 +68,6 @@ int ioopm_list_iterator_remove(ioopm_list_iterator_t *it)
     return value; 
 }
 
-static list_entry_t *entry_create(int value)
-{
-    list_entry_t *entry = calloc(1, sizeof(list_entry_t));
-    entry->value = value; 
-    entry->next = NULL;
-    return entry; 
-}
-
 void ioopm_list_iterator_insert(ioopm_list_iterator_t *it, int element)
 {
     list_entry_t *entry = entry_create(element); 

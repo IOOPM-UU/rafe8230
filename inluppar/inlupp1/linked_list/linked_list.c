@@ -19,7 +19,7 @@ ioopm_list_t *ioopm_list_create(void)
     return linked_list;
 }
 
-static list_entry_t *entry_create(int value)
+list_entry_t *entry_create(int value)
 {
     list_entry_t *entry = calloc(1, sizeof(list_entry_t));
     entry->value = value; 

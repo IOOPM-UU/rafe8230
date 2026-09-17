@@ -13,3 +13,5 @@ struct list
     list_entry_t *last;
     int size;
 };
+
+list_entry_t *entry_create(int value);
