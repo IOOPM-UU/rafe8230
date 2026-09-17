@@ -4,12 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct hash_table_iterator
-{
-  ioopm_hash_table_t *ht;
-  int current_bucket;
-  ioopm_entry_t *current_entry;
-};
 
 static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
 {

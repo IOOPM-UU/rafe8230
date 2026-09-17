@@ -16,6 +16,13 @@
 
 typedef struct hash_table_iterator ioopm_hash_table_iterator_t;
 
+struct hash_table_iterator
+{
+  ioopm_hash_table_t *ht;
+  int current_bucket;
+  ioopm_entry_t *current_entry;
+};
+
 /// @brief Create an iterator for a hash table.
 /// @param ht hash table to iterate over
 /// @return a new iterator positioned at the first entry if it exists, and positioned at-the-end if ht is empty

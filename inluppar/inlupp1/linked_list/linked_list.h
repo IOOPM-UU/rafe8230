@@ -3,6 +3,8 @@
 
 typedef struct list ioopm_list_t; /// Meta: struct definition goes in C file
 
+typedef struct list_entry list_entry_t; 
+
 /// @brief Creates a new empty list
 /// @return an empty linked list
 ioopm_list_t *ioopm_list_create(void);

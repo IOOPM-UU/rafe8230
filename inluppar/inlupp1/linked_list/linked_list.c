@@ -2,21 +2,9 @@
 #include "linked_list.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "linked_list_private.h"
 
-typedef struct list_entry list_entry_t; 
 
-struct list_entry
-{
-    int value; 
-    list_entry_t *next;
-};
-
-struct list 
-{
-    list_entry_t sentinel;
-    list_entry_t *last;
-    int size;
-};
 
 
 bool ioopm_list_is_empty(ioopm_list_t *list)
@@ -41,23 +29,14 @@ static list_entry_t *entry_create(int value)
 
 void ioopm_list_destroy(ioopm_list_t *list)
 { 
-    if (list->size < 1)
+    list_entry_t *entry = list->sentinel.next;
+    while (entry != NULL)
     {
-        free(list); 
-        return;
+        list_entry_t *next = entry->next;
+        free(entry); 
+        entry = next; 
     }
-    list_entry_t *entry = &list->sentinel;
-    while (true)
-    {
-        if (!(list->sentinel.next == NULL))
-        {
-            list->sentinel.next = entry->next;
-            free(entry->next);
-        }
-        
-        free(entry);
-        return;
-    }
+    free(list); 
 }
 void ioopm_list_append(ioopm_list_t *list, int value)
 {
@@ -163,7 +142,6 @@ int ioopm_list_get(ioopm_list_t *list, int index)
         return -1; 
     }
     
-
     for (int i = 0; i < index; i++)
     {
         current = current->next; 
