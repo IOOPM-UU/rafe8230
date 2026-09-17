@@ -42,7 +42,7 @@ int ioopm_list_iterator_current(ioopm_list_iterator_t *it)
         return -1; 
     }
     
-    return it->current_entry->value;
+    return ioopm_list_get(it->list, it->index);
 }
 
 int ioopm_list_iterator_remove(ioopm_list_iterator_t *it)
