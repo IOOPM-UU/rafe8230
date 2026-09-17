@@ -124,7 +124,6 @@ void test_iterate_table_large_checks(void)
     ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
 
     // No_Buckets does not work because of our hash function
- 
     char keys[NO_ENTRIES][8]; 
 
     // Initialize a large ht

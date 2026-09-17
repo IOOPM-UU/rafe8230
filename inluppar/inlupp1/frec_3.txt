@@ -1,0 +1,4 @@
+to test or not to test.
+testing the test is the test [of the tester].
+we test what we test, and we test again.
+not testing is not an option!
