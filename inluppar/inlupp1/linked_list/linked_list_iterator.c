@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "linked_list_private.h"
 #include <assert.h>
+#include "common.h"
 
 ioopm_list_iterator_t *ioopm_list_iterator_create(ioopm_list_t *l)
 {
@@ -35,25 +36,25 @@ void ioopm_list_iterator_advance(ioopm_list_iterator_t *it)
     it->index++; 
 }
 
-int ioopm_list_iterator_current(ioopm_list_iterator_t *it)
+elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *it)
 {
     if (it->current_entry == NULL)
     {
-        return -1; 
+        return int_elem(-1); 
     }
     
     return ioopm_list_get(it->list, it->index);
 }
 
-int ioopm_list_iterator_remove(ioopm_list_iterator_t *it)
+elem_t ioopm_list_iterator_remove(ioopm_list_iterator_t *it)
 {
     if (ioopm_list_iterator_at_end(it))
     {
-        return -1; 
+        return int_elem(-1); 
     }
 
     list_entry_t *current = it->current_entry;
-    int value = current->value; 
+    elem_t value = current->value; 
 
     it->previous_entry->next = current->next;
 
@@ -68,7 +69,7 @@ int ioopm_list_iterator_remove(ioopm_list_iterator_t *it)
     return value; 
 }
 
-void ioopm_list_iterator_insert(ioopm_list_iterator_t *it, int element)
+void ioopm_list_iterator_insert(ioopm_list_iterator_t *it, elem_t element)
 {
     list_entry_t *entry = entry_create(element); 
 

@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "hash_table.h"
+#include "common.h"
 
 #define No_Buckets 17
 
@@ -8,7 +9,7 @@
 struct entry
 {
   char *key;     // holds the key
-  int value;     // holds the value
+  elem_t value;     // holds the value
   ioopm_entry_t *next; // points to the next entry (possibly NULL)
 };
 

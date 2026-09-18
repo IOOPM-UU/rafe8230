@@ -1,6 +1,7 @@
 #pragma once
 #include "hash_table.h"
 #include <stdbool.h>
+#include "common.h"
 
 /**
 * @file hash_table_iterator.h
@@ -52,7 +53,7 @@ char *ioopm_hash_table_iterator_current_key(const ioopm_hash_table_iterator_t *i
 /// @pre it is positioned at an entry
 /// @param it iterator operated upon
 /// @return the value if the current entry
-int ioopm_hash_table_iterator_current_value(const ioopm_hash_table_iterator_t *it);
+elem_t ioopm_hash_table_iterator_current_value(const ioopm_hash_table_iterator_t *it);
 
 /// @brief Get the value of the current entry
 /// @pre it is positioned at entry

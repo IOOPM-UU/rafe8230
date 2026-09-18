@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "linked_list_private.h"
+#include "common.h"
 
 
 
@@ -19,7 +20,7 @@ ioopm_list_t *ioopm_list_create(void)
     return linked_list;
 }
 
-list_entry_t *entry_create(int value)
+list_entry_t *entry_create(elem_t value)
 {
     list_entry_t *entry = calloc(1, sizeof(list_entry_t));
     entry->value = value; 
@@ -38,7 +39,7 @@ void ioopm_list_destroy(ioopm_list_t *list)
     }
     free(list); 
 }
-void ioopm_list_append(ioopm_list_t *list, int value)
+void ioopm_list_append(ioopm_list_t *list, elem_t value)
 {
     list_entry_t *entry = entry_create(value);
     list->last->next = entry;
@@ -46,7 +47,7 @@ void ioopm_list_append(ioopm_list_t *list, int value)
     list->last = entry;
 }
 
-void ioopm_list_prepend(ioopm_list_t *list, int value)
+void ioopm_list_prepend(ioopm_list_t *list, elem_t value)
 {
     list_entry_t *entry = entry_create(value); 
     entry->next = list->sentinel.next;
@@ -61,22 +62,22 @@ void ioopm_list_prepend(ioopm_list_t *list, int value)
     list->size++;  
 }
 
-int ioopm_list_head(const ioopm_list_t *list)
+elem_t ioopm_list_head(const ioopm_list_t *list)
 {
     if (list->sentinel.next == NULL)
     {
-        return -1;
+        return int_elem(-1);
     }
     
     return list->sentinel.next->value; 
     
 }
 
-int ioopm_list_last(const ioopm_list_t *list)
+elem_t ioopm_list_last(const ioopm_list_t *list)
 {
     if (list->sentinel.next == NULL)
     {
-        return -1;
+        return int_elem(-1);
     }
     return list->last->value; 
     
@@ -93,7 +94,7 @@ static list_entry_t *find_previous_entry(ioopm_list_t *list, const size_t index)
     return previous;
 }
 
-void ioopm_list_insert(ioopm_list_t *list, size_t index, int value)
+void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value)
 {
     list_entry_t *entry = entry_create(value); 
     list_entry_t *previous = find_previous_entry(list, index); 
@@ -109,11 +110,11 @@ void ioopm_list_insert(ioopm_list_t *list, size_t index, int value)
     return;
 }
 
-int ioopm_list_remove(ioopm_list_t *list, size_t index)
+elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
 {
     if (ioopm_list_is_empty(list))
     {
-        return -1; 
+        return int_elem(-1); 
     }
     
     list_entry_t *previous = find_previous_entry(list, index); 
@@ -125,7 +126,7 @@ int ioopm_list_remove(ioopm_list_t *list, size_t index)
         list->last = previous; 
     }
 
-    int value = current->value; 
+    elem_t value = current->value; 
     free(current); 
     list->size--;
 
@@ -133,13 +134,13 @@ int ioopm_list_remove(ioopm_list_t *list, size_t index)
     return value; 
 }
 
-int ioopm_list_get(const ioopm_list_t *list, const size_t index)
+elem_t ioopm_list_get(const ioopm_list_t *list, const size_t index)
 {
     list_entry_t *current = list->sentinel.next;
 
     if (list->size == 0)
     {
-        return -1; 
+        return int_elem(-1); 
     }
     
     for (size_t i = 0; i < index; i++)

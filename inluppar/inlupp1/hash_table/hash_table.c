@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "hash_table_private.h"
+#include "common.h"
 
 
 static size_t string_knr_hash(const char *str)
@@ -28,7 +29,7 @@ ioopm_hash_table_t *ioopm_hash_table_create(void) {
     return ht;
 }
 
-static ioopm_entry_t *ioopm_entry_create(char *key, int value, ioopm_entry_t *next)
+static ioopm_entry_t *ioopm_entry_create(char *key, elem_t value, ioopm_entry_t *next)
 {
     ioopm_entry_t *entry = calloc(1, sizeof(ioopm_entry_t));
     entry->key = key;
@@ -76,7 +77,7 @@ ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, const char *key
     return previous; 
 }
 
-bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const char *key, int *result)
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const char *key, elem_t *result)
 {
     ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
     ioopm_entry_t *current = previous->next;
@@ -101,11 +102,11 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const char *key, int *resul
     }
     
     // the bucket is empty or key is not in bucket
-    *result = 0; 
+    *result = int_elem(0); 
     return false;
 }
 
-void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
+void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, elem_t value)
 {
   // find previous entry, or the last entry if the key does not exist
   ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
@@ -122,7 +123,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
   }
 }
 
-bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, const char *key, int *result)
+bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, const char *key, elem_t *result)
 {
     ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key); 
     ioopm_entry_t *current = previous->next; 
@@ -135,7 +136,7 @@ bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, const char *key, int *resu
     }
     else
     {
-        *result = 0; 
+        *result = int_elem(0); 
         return false;
     }
 }
@@ -143,7 +144,7 @@ bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, const char *key, int *resu
 
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const char *key)
 {
-    int result = 0; 
+    elem_t result = int_elem(0); 
     return ioopm_hash_table_lookup(ht, key, &result); 
 }
 

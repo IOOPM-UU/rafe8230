@@ -42,15 +42,15 @@ void test_iterator_advance_single(void)
 {
     ioopm_list_t *list = ioopm_list_create();
 
-    int value = 1; 
+    elem_t value = int_elem(1); 
     ioopm_list_append(list, value); 
 
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list); 
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value.i);
     ioopm_list_iterator_advance(it);
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), -1); 
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, -1); 
 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list); 
@@ -59,9 +59,9 @@ void test_iterator_at_end_of_filled(void)
 {
     ioopm_list_t *list = ioopm_list_create();
     
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(list, value1);
     ioopm_list_append(list, value2);
@@ -85,7 +85,7 @@ void test_iterator_current_empty(void)
     ioopm_list_t *list = ioopm_list_create();
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list); 
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), -1); 
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, -1); 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list); 
     
@@ -93,9 +93,9 @@ void test_iterator_current_empty(void)
 void test_iterator_current_filled(void)
 {
     ioopm_list_t *list = ioopm_list_create();
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(list, value1);
     ioopm_list_append(list, value2);
@@ -103,13 +103,13 @@ void test_iterator_current_filled(void)
     
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list); 
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value1.i);
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value2);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value2.i);
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value3);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value3.i);
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), -1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, -1);
 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list); 
@@ -122,7 +122,7 @@ void test_iterator_remove_current_empty(void)
 
     
     CU_ASSERT_EQUAL(ioopm_list_size(list), 0);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_remove(it), -1); 
+    CU_ASSERT_EQUAL(ioopm_list_iterator_remove(it).i, -1); 
     CU_ASSERT_EQUAL(ioopm_list_size(list), 0);
 
     ioopm_list_iterator_destroy(it);
@@ -133,9 +133,9 @@ void test_iterator_remove_current_first(void)
 {
     ioopm_list_t *list = ioopm_list_create();
     
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(list, value1);
     ioopm_list_append(list, value2);
@@ -143,15 +143,15 @@ void test_iterator_remove_current_first(void)
     
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list); 
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value1.i);
     
     CU_ASSERT_EQUAL(ioopm_list_size(list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_remove(it), value1); 
+    CU_ASSERT_EQUAL(ioopm_list_iterator_remove(it).i, value1.i); 
     CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value2);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value2.i);
     
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value3);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value3.i);
     
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list); 
@@ -161,9 +161,9 @@ void test_iterator_remove_current_last(void)
 {
     ioopm_list_t *list = ioopm_list_create();
     
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(list, value1);
     ioopm_list_append(list, value2);
@@ -171,15 +171,15 @@ void test_iterator_remove_current_last(void)
 
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value1.i);
     
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value2);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value2.i);
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value3);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value3.i);
     
     CU_ASSERT_EQUAL(ioopm_list_size(list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_remove(it), value3); 
+    CU_ASSERT_EQUAL(ioopm_list_iterator_remove(it).i, value3.i); 
     CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
     CU_ASSERT_TRUE(ioopm_list_iterator_at_end(it)); 
     
@@ -192,9 +192,9 @@ void test_iterator_remove_current_middle(void)
 {
     ioopm_list_t *list = ioopm_list_create();
     
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(list, value1);
     ioopm_list_append(list, value2);
@@ -202,14 +202,14 @@ void test_iterator_remove_current_middle(void)
     
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);  
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value1.i);
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value2);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value2.i);
     
     CU_ASSERT_EQUAL(ioopm_list_size(list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_remove(it), value2); 
+    CU_ASSERT_EQUAL(ioopm_list_iterator_remove(it).i, value2.i); 
     CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value3);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value3.i);
     
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list); 
@@ -219,27 +219,27 @@ void test_iterator_insert_current_first(void)
 {
     ioopm_list_t *list = ioopm_list_create();
     
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(list, value1);
     ioopm_list_append(list, value2);
     
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list); 
     
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value1.i);
 
     CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
     ioopm_list_iterator_insert(it, value3);
     CU_ASSERT_EQUAL(ioopm_list_size(list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value3);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value3.i);
 
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value1.i);
 
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value2);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value2.i);
 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list); 
@@ -249,25 +249,25 @@ void test_iterator_insert_current_middle(void)
 {
     ioopm_list_t *list = ioopm_list_create();
     
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(list, value1);
     ioopm_list_append(list, value2);
     
     ioopm_list_iterator_t *it = ioopm_list_iterator_create(list); 
     
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value1);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value1.i);
     ioopm_list_iterator_advance(it);
     
     CU_ASSERT_EQUAL(ioopm_list_size(list), 2);
     ioopm_list_iterator_insert(it, value3);
     CU_ASSERT_EQUAL(ioopm_list_size(list), 3);
     
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value3);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value3.i);
     ioopm_list_iterator_advance(it);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value2);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value2.i);
 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list); 
@@ -276,9 +276,9 @@ void test_iterator_insert_current_middle(void)
 void test_iterator_insert_current_last(void)
 {
     ioopm_list_t *list = ioopm_list_create();
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(list, value1);
     ioopm_list_append(list, value2);
@@ -290,7 +290,7 @@ void test_iterator_insert_current_last(void)
     ioopm_list_iterator_insert(it, value3);
     
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it), value3);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, value3.i);
 
     ioopm_list_iterator_destroy(it);
     ioopm_list_destroy(list); 

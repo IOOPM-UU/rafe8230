@@ -31,14 +31,14 @@ void test_iterate_table_size_one(void)
 {
     ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
     char *key = "a"; 
-    int value = 1; 
+    elem_t value = int_elem(1); 
     ioopm_hash_table_insert(ht, key, value);
 
     ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
     
     CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it), key);
 
-    CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it), value);
+    CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it).i, value.i);
 
     ioopm_hash_table_iterator_destroy(it); 
     ioopm_hash_table_destroy(ht); 
@@ -55,7 +55,7 @@ void test_iterate_table_size_mulitple(void)
     for (int i = 0; i < No_Buckets; i++)
     {
         snprintf(keys[i], sizeof(keys[i]), "key%d", i); 
-        ioopm_hash_table_insert(ht, keys[i], i);
+        ioopm_hash_table_insert(ht, keys[i], int_elem(i));
     }
 
     CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), No_Buckets);
@@ -87,26 +87,26 @@ void test_iterate_table_multiple_checks(void)
     for (int i = 0; i < 20; i++)
     {
         snprintf(keys[i], sizeof(keys[i]), "key%d", i); 
-        ioopm_hash_table_insert(ht, keys[i], i);
+        ioopm_hash_table_insert(ht, keys[i], int_elem(i));
     }
 
     ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
     int counter = 0;
     bool seen[20] = { false };
-    int value = 0; 
+    elem_t value = int_elem(0); 
     while (!ioopm_hash_table_iterator_at_end(it))
     {
         // Update value to current and check if its inbounds 
         value = ioopm_hash_table_iterator_current_value(it);
-        CU_ASSERT_TRUE(value >= 0 && value < 20);
+        CU_ASSERT_TRUE(value.i >= 0 && value.i < 20);
 
 
-        CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it), keys[value]);
-        CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it), value); 
+        CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it), keys[value.i]);
+        CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it).i, value.i); 
         
         // Check and update seen value to true
-        CU_ASSERT_FALSE(seen[value]); 
-        seen[value] = true; 
+        CU_ASSERT_FALSE(seen[value.i]); 
+        seen[value.i] = true; 
         
         ioopm_hash_table_iterator_advance(it); 
         counter++;
@@ -130,7 +130,7 @@ void test_iterate_table_large_checks(void)
     for (int i = 0; i < NO_ENTRIES; i++)
     {
         snprintf(keys[i], sizeof(keys[i]), "key%d", i); 
-        ioopm_hash_table_insert(ht, keys[i], i);
+        ioopm_hash_table_insert(ht, keys[i], int_elem(i));
     }
 
     ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
@@ -139,16 +139,16 @@ void test_iterate_table_large_checks(void)
     while (!ioopm_hash_table_iterator_at_end(it))
     {
         // Update value to current and check if its inbounds 
-        int value = ioopm_hash_table_iterator_current_value(it);
-        CU_ASSERT_TRUE(value >= 0 && value < NO_ENTRIES);
+        elem_t value = ioopm_hash_table_iterator_current_value(it);
+        CU_ASSERT_TRUE(value.i >= 0 && value.i < NO_ENTRIES);
 
 
-        CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it), keys[value]);
-        CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it), value); 
+        CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it), keys[value.i]);
+        CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it).i, value.i); 
         
         // Check and update seen value to true
-        CU_ASSERT_FALSE(seen[value]); 
-        seen[value] = true; 
+        CU_ASSERT_FALSE(seen[value.i]); 
+        seen[value.i] = true; 
         
         ioopm_hash_table_iterator_advance(it); 
         counter++;
@@ -203,3 +203,5 @@ int main(void)
         
     return CU_get_error();
 }
+
+

@@ -3,6 +3,7 @@
 #include "hash_table_iterator.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "common.h"
 
 
 static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
@@ -66,12 +67,12 @@ char *ioopm_hash_table_iterator_current_key(const ioopm_hash_table_iterator_t *i
     return it->current_entry->key;
 }
 
-int ioopm_hash_table_iterator_current_value(const ioopm_hash_table_iterator_t *it)
+elem_t ioopm_hash_table_iterator_current_value(const ioopm_hash_table_iterator_t *it)
 {
     return it->current_entry->value;
 }
 
 size_t ioopm_hash_table_iterator_current_positive_value(const ioopm_hash_table_iterator_t *it)
 {
-    return it->current_entry->value;
+    return it->current_entry->value.u;
 }

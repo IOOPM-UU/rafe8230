@@ -27,7 +27,7 @@ void test_linked_list_create_destroy_with_one_entry(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
 
     ioopm_list_append(l_list, value);
     ioopm_list_destroy(l_list); 
@@ -38,11 +38,11 @@ void test_linked_list_create_destroy_with_multiple_entries(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
-    int value4 = 4;
-    int value5 = 5;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
+    elem_t value4 = int_elem(4);
+    elem_t value5 = int_elem(5);
 
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
@@ -58,12 +58,12 @@ void test_linked_list_append_one(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
 
     ioopm_list_append(l_list, value);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 1);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -73,18 +73,18 @@ void test_linked_list_append_three(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
 
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
     ioopm_list_append(l_list, value3);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value1);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1), value2);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2), value3);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value1.i);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1).i, value2.i);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2).i, value3.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -94,11 +94,11 @@ void test_linked_list_prepend_one(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
 
     ioopm_list_prepend(l_list, value);
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 1);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value.i);
     
     ioopm_list_destroy(l_list); 
 
@@ -108,18 +108,18 @@ void test_linked_list_prepend_three(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
 
     ioopm_list_prepend(l_list, value1);
     ioopm_list_prepend(l_list, value2);
     ioopm_list_prepend(l_list, value3);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2), value1);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1), value2);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value3);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2).i, value1.i);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1).i, value2.i);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value3.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -130,7 +130,7 @@ void test_empty_list_head(void)
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 0);
-    CU_ASSERT_EQUAL(ioopm_list_head(l_list), -1);
+    CU_ASSERT_EQUAL(ioopm_list_head(l_list).i, -1);
     
     ioopm_list_destroy(l_list); 
 }
@@ -140,11 +140,11 @@ void test_single_list_head(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
     ioopm_list_append(l_list, value); 
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 1);
-    CU_ASSERT_EQUAL(ioopm_list_head(l_list), 1);
+    CU_ASSERT_EQUAL(ioopm_list_head(l_list).i, 1);
     
     ioopm_list_destroy(l_list); 
 }
@@ -154,17 +154,17 @@ void test_sized_list_head_prepend(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
 
     ioopm_list_prepend(l_list, value1);
     ioopm_list_prepend(l_list, value2);
     ioopm_list_prepend(l_list, value3);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_head(l_list), value3);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value1);
+    CU_ASSERT_EQUAL(ioopm_list_head(l_list).i, value3.i);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value1.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -174,17 +174,17 @@ void test_sized_list_head_append(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
 
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
     ioopm_list_append(l_list, value3);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_head(l_list), value1);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value3);
+    CU_ASSERT_EQUAL(ioopm_list_head(l_list).i, value1.i);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value3.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -195,7 +195,7 @@ void test_empty_list_last(void)
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 0);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), -1);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, -1);
     
     ioopm_list_destroy(l_list); 
 }
@@ -205,11 +205,11 @@ void test_single_list_last(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
     ioopm_list_append(l_list, value);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 1);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), 1);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, 1);
     
     ioopm_list_destroy(l_list); 
 }
@@ -219,16 +219,16 @@ void test_sized_list_last_prepend(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
 
     ioopm_list_prepend(l_list, value1);
     ioopm_list_prepend(l_list, value2);
     ioopm_list_prepend(l_list, value3);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value1);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value1.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -238,16 +238,16 @@ void test_sized_list_last_append(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
 
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
     ioopm_list_append(l_list, value3);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value3);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value3.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -257,13 +257,13 @@ void test_list_insert_empty(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
+    elem_t value1 = int_elem(1);
 
     ioopm_list_insert(l_list, 0, value1);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 1);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value1); 
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value1);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value1.i); 
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value1.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -272,18 +272,18 @@ void test_list_insert_middle(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value_middle = 3; 
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value_middle = int_elem(3); 
 
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
     ioopm_list_insert(l_list, 1, value_middle);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value2);
-    CU_ASSERT_EQUAL(ioopm_list_head(l_list), value1);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1), value_middle);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value2.i);
+    CU_ASSERT_EQUAL(ioopm_list_head(l_list).i, value1.i);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1).i, value_middle.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -293,18 +293,18 @@ void test_list_insert_last(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3; 
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3); 
 
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
     ioopm_list_insert(l_list, 2, value3);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value3);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2), value3);
-    CU_ASSERT_EQUAL(ioopm_list_head(l_list), value1);
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value3.i);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2).i, value3.i);
+    CU_ASSERT_EQUAL(ioopm_list_head(l_list).i, value1.i);
     
     ioopm_list_destroy(l_list); 
 }
@@ -325,10 +325,10 @@ void test_list_insert_remove_one(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
+    elem_t value1 = int_elem(1);
 
     ioopm_list_insert(l_list, 0, value1);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value1);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value1.i);
 
     ioopm_list_remove(l_list, 0);
 
@@ -342,21 +342,21 @@ void test_list_incert_three_remove_first(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
 
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
 
     ioopm_list_insert(l_list, 0, value3);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value3);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value3.i);
     ioopm_list_remove(l_list, 0);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 2);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value1); 
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1), value2); 
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value2); 
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value1.i); 
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1).i, value2.i); 
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value2.i); 
     
     ioopm_list_destroy(l_list); 
     
@@ -366,21 +366,21 @@ void test_list_incert_three_remove_middle(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
     
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
     
     ioopm_list_insert(l_list, 1, value3);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1), value3);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1).i, value3.i);
     ioopm_list_remove(l_list, 1);
     
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 2);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value1); 
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1), value2); 
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value2); 
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value1.i); 
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1).i, value2.i); 
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value2.i); 
 
     
     ioopm_list_destroy(l_list); 
@@ -391,21 +391,21 @@ void test_list_incert_three_remove_last(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
     
-    int value1 = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value1 = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     
     ioopm_list_append(l_list, value1);
     ioopm_list_append(l_list, value2);
     
     ioopm_list_insert(l_list, 2, value3);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2), value3);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2).i, value3.i);
     ioopm_list_remove(l_list, 2);
     
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 2);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), value1); 
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1), value2); 
-    CU_ASSERT_EQUAL(ioopm_list_last(l_list), value2); 
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value1.i); 
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1).i, value2.i); 
+    CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value2.i); 
     
     ioopm_list_destroy(l_list); 
 }
@@ -414,7 +414,7 @@ void test_list_get_empty(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), -1);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, -1);
     
     ioopm_list_destroy(l_list); 
 }
@@ -423,10 +423,10 @@ void test_list_get_one(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
     ioopm_list_insert(l_list, 0, value);
 
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), 1);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, 1);
     
     ioopm_list_destroy(l_list); 
     
@@ -436,16 +436,16 @@ void test_list_get_three(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
-    int value2 = 2;
-    int value3 = 3;
+    elem_t value = int_elem(1);
+    elem_t value2 = int_elem(2);
+    elem_t value3 = int_elem(3);
     ioopm_list_insert(l_list, 0, value);
     ioopm_list_insert(l_list, 1, value2);
     ioopm_list_insert(l_list, 2, value3);
 
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0), 1);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1), 2);
-    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2), 3);  
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, 1);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 1).i, 2);
+    CU_ASSERT_EQUAL(ioopm_list_get(l_list, 2).i, 3);  
     
     ioopm_list_destroy(l_list); 
 }
@@ -463,7 +463,7 @@ void test_list_size_one(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
     ioopm_list_append(l_list, value);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 1);
@@ -475,11 +475,11 @@ void test_list_size_three(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
     ioopm_list_append(l_list, value);
-    int value2 = 2;
+    elem_t value2 = int_elem(2);
     ioopm_list_append(l_list, value2);
-    int value3 = 3;
+    elem_t value3 = int_elem(3);
     ioopm_list_append(l_list, value3);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 3);
@@ -500,7 +500,7 @@ void test_list_empty_not_empty(void)
     ioopm_list_t *l_list = ioopm_list_create(); 
     CU_ASSERT_PTR_NOT_NULL(l_list); 
 
-    int value = 1;
+    elem_t value = int_elem(1);
     ioopm_list_append(l_list, value);
 
     CU_ASSERT_FALSE(ioopm_list_is_empty(l_list));
