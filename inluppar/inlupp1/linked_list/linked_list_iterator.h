@@ -8,7 +8,7 @@ typedef struct list_iterator ioopm_list_iterator_t;
 struct list_iterator
 {
   ioopm_list_t *list;
-  int index;
+  size_t index;
   list_entry_t *current_entry;
   list_entry_t *previous_entry;
 };
@@ -24,7 +24,7 @@ void ioopm_list_iterator_destroy(ioopm_list_iterator_t *it);
 /// @brief Checks if there are more elements to iterate over
 /// @param it the iterator
 /// @return true if there is at least one more element
-bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *it);
+bool ioopm_list_iterator_at_end(const ioopm_list_iterator_t *it);
 
 /// @brief Step the iterator forward one step
 /// @param it the iterator

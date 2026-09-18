@@ -11,7 +11,7 @@ struct list
 {
     list_entry_t sentinel;
     list_entry_t *last;
-    int size;
+    size_t size;
 };
 
 list_entry_t *entry_create(int value);

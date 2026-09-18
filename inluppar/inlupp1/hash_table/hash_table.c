@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include "hash_table.h"
 #include <stddef.h>
@@ -46,7 +47,7 @@ static ioopm_entry_t *entry_destroy(ioopm_entry_t *entry)
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     
-    for (int i = 0; i < No_Buckets; i++)
+    for (size_t i = 0; i < No_Buckets; i++)
     {
         ioopm_entry_t *current = ht->buckets[i].next;
         while (current != NULL)
@@ -59,7 +60,7 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     return;
 }
 
-ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, char *key)
+ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, const char *key)
 {
     // find bucket
     size_t bucket = string_knr_hash(key) % No_Buckets;
@@ -75,7 +76,7 @@ ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, char *key)
     return previous; 
 }
 
-bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result)
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const char *key, int *result)
 {
     ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
     ioopm_entry_t *current = previous->next;
@@ -121,7 +122,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
   }
 }
 
-bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
+bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, const char *key, int *result)
 {
     ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key); 
     ioopm_entry_t *current = previous->next; 
@@ -140,22 +141,22 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
 }
 
 
-bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key)
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const char *key)
 {
     int result = 0; 
     return ioopm_hash_table_lookup(ht, key, &result); 
 }
 
-int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+size_t ioopm_hash_table_size(const ioopm_hash_table_t *ht)
 {
     
     return ht->ioopm_table_size;
 }
 
-bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
+bool ioopm_hash_table_is_empty(const ioopm_hash_table_t *ht)
 {
     
-    return ht->ioopm_table_size == 0;
+    return ht->ioopm_table_size == 0; 
 }
 
 

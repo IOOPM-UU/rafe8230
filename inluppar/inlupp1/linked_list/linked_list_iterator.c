@@ -22,7 +22,7 @@ void ioopm_list_iterator_destroy(ioopm_list_iterator_t *it)
     free(it);
 }
 
-bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *it)
+bool ioopm_list_iterator_at_end(const ioopm_list_iterator_t *it)
 {
     return it->index == it->list->size;
 }

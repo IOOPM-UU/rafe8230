@@ -17,7 +17,7 @@ struct hash_table
   // DODGE: hard-coding number of buckets as 17.
   // NOTE: addressing this dodge is optional.
   ioopm_entry_t buckets[No_Buckets];
-  int ioopm_table_size;
+  size_t ioopm_table_size;
 };
 
 

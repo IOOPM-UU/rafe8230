@@ -13,7 +13,6 @@
 /// @param ht a hash table containing the frequencies of the words found so far
 void process_word(char *word, ioopm_hash_table_t *ht)
 {
-  // FIXME: Rewrite to match your own interface, error-handling, etc.
   int freq = 0;
 
   if (ioopm_hash_table_lookup(ht, word, &freq))
@@ -28,7 +27,7 @@ void process_word(char *word, ioopm_hash_table_t *ht)
 /// @brief Process a single file, updating the frequencies of its words
 /// @param filename the name of the file to process
 /// @param ht a hash table containing the frequencies of the words found so far
-void process_file(char *filename, ioopm_hash_table_t *ht)
+void process_file(const char *filename, ioopm_hash_table_t *ht)
 {
   FILE *f = fopen(filename, "r");
   while (true)
@@ -55,7 +54,7 @@ void process_file(char *filename, ioopm_hash_table_t *ht)
 struct freq_word
 {
   char *word;
-  int freq;
+  size_t freq;
 };
 
 /// @brief Compare the frequency of two freq_words through pointers to them
@@ -104,7 +103,7 @@ int main(int argc, char *argv[])
     process_file(argv[i], ht);
   }
 
-  int size = ioopm_hash_table_size(ht);
+  size_t size = ioopm_hash_table_size(ht);
   struct freq_word freq_words[size];
 
   // FIXME: Iterate over hash table to dump its words and
@@ -113,7 +112,7 @@ int main(int argc, char *argv[])
   int i = 0;
   while (!ioopm_hash_table_iterator_at_end(it))
   {
-    int value = ioopm_hash_table_iterator_current_value(it); 
+    size_t value = ioopm_hash_table_iterator_current_positive_value(it); 
     char *word = ioopm_hash_table_iterator_current_key(it); 
     
     freq_words[i].freq = value; 
@@ -125,9 +124,9 @@ int main(int argc, char *argv[])
   
   sort_freq_words(freq_words, size);
 
-  for (int i = 0; i < size; ++i)
+  for (size_t i = 0; i < size; ++i)
   {
-    printf("%s: %d\n", freq_words[i].word, freq_words[i].freq);
+    printf("%s: %zd\n", freq_words[i].word, freq_words[i].freq);
     free(freq_words[i].word); 
   }
 

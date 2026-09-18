@@ -7,7 +7,7 @@
 
 
 
-bool ioopm_list_is_empty(ioopm_list_t *list)
+bool ioopm_list_is_empty(const ioopm_list_t *list)
 {
     return list->size == 0; 
 }
@@ -61,7 +61,7 @@ void ioopm_list_prepend(ioopm_list_t *list, int value)
     list->size++;  
 }
 
-int ioopm_list_head(ioopm_list_t *list)
+int ioopm_list_head(const ioopm_list_t *list)
 {
     if (list->sentinel.next == NULL)
     {
@@ -72,7 +72,7 @@ int ioopm_list_head(ioopm_list_t *list)
     
 }
 
-int ioopm_list_last(ioopm_list_t *list)
+int ioopm_list_last(const ioopm_list_t *list)
 {
     if (list->sentinel.next == NULL)
     {
@@ -82,18 +82,18 @@ int ioopm_list_last(ioopm_list_t *list)
     
 }
 
-static list_entry_t *find_previous_entry(ioopm_list_t *list, int index)
+static list_entry_t *find_previous_entry(ioopm_list_t *list, const size_t index)
 {
     list_entry_t *previous = &list->sentinel;
 
-    for (int i = 0; i < index; i++)
+    for (size_t i = 0; i < index; i++)
     {
         previous = previous->next;
     }
     return previous;
 }
 
-void ioopm_list_insert(ioopm_list_t *list, int index, int value)
+void ioopm_list_insert(ioopm_list_t *list, size_t index, int value)
 {
     list_entry_t *entry = entry_create(value); 
     list_entry_t *previous = find_previous_entry(list, index); 
@@ -109,7 +109,7 @@ void ioopm_list_insert(ioopm_list_t *list, int index, int value)
     return;
 }
 
-int ioopm_list_remove(ioopm_list_t *list, int index)
+int ioopm_list_remove(ioopm_list_t *list, size_t index)
 {
     if (ioopm_list_is_empty(list))
     {
@@ -133,7 +133,7 @@ int ioopm_list_remove(ioopm_list_t *list, int index)
     return value; 
 }
 
-int ioopm_list_get(ioopm_list_t *list, int index)
+int ioopm_list_get(const ioopm_list_t *list, const size_t index)
 {
     list_entry_t *current = list->sentinel.next;
 
@@ -142,14 +142,14 @@ int ioopm_list_get(ioopm_list_t *list, int index)
         return -1; 
     }
     
-    for (int i = 0; i < index; i++)
+    for (size_t i = 0; i < index; i++)
     {
         current = current->next; 
     }
     return current->value;
 }
 
-int ioopm_list_size(ioopm_list_t *list)
+size_t ioopm_list_size(const ioopm_list_t *list)
 {
     return list->size;
 }
