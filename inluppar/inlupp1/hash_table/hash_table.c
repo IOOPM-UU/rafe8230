@@ -9,27 +9,18 @@
 #include "common.h"
 
 
-static size_t string_knr_hash(const char *str)
-{
-  size_t result = 0;
-  while (*str != '\0')
-  {
-    result = result * 31 + ((unsigned char) *str);
-    str++;
-  }
-  return result;
-}
-
-ioopm_hash_table_t *ioopm_hash_table_create(void) {
+ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *h_fn, ioopm_eq_function *eq_fn) {
     // NOTE: Calloc initializes all bits to 0.
     // We therefore do not have to create a loop
     // setting all the buckets to NULL
     ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
     ht->ioopm_table_size = 0; 
+    ht->hash_fn = h_fn;
+    ht->hash_eq_fn = eq_fn;  
     return ht;
 }
 
-static ioopm_entry_t *ioopm_entry_create(char *key, elem_t value, ioopm_entry_t *next)
+static ioopm_entry_t *ioopm_entry_create(elem_t key, elem_t value, ioopm_entry_t *next)
 {
     ioopm_entry_t *entry = calloc(1, sizeof(ioopm_entry_t));
     entry->key = key;
@@ -61,23 +52,23 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     return;
 }
 
-ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, const char *key)
+ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, elem_t key)
 {
     // find bucket
-    size_t bucket = string_knr_hash(key) % No_Buckets;
+    size_t bucket = ht->hash_fn(key) % No_Buckets;
     
     // look for an entry with the key we want
     ioopm_entry_t *previous = &ht->buckets[bucket];
     ioopm_entry_t *current = previous->next;
-    while (current != NULL && strcmp(current->key, key) != 0)
+    while (current != NULL && !ht->hash_eq_fn(current->key, key) != 0)
     {
         previous = current;
         current = current->next;
     }
     return previous; 
-}
+}   
 
-bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const char *key, elem_t *result)
+bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
 {
     ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
     ioopm_entry_t *current = previous->next;
@@ -86,7 +77,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const char *key, elem_t *re
     while (current != NULL)
     {
 
-        if (strcmp(key, current->key) == 0)
+        if (ht->hash_eq_fn(current->key, key))
         {
 
             // case : no middle element and is last elementx
@@ -106,7 +97,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, const char *key, elem_t *re
     return false;
 }
 
-void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, elem_t value)
+void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
 {
   // find previous entry, or the last entry if the key does not exist
   ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
@@ -123,7 +114,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, elem_t value)
   }
 }
 
-bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, const char *key, elem_t *result)
+bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, elem_t key, elem_t *result)
 {
     ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key); 
     ioopm_entry_t *current = previous->next; 
@@ -142,7 +133,7 @@ bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, const char *key, elem_t *r
 }
 
 
-bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, const char *key)
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key)
 {
     elem_t result = int_elem(0); 
     return ioopm_hash_table_lookup(ht, key, &result); 

@@ -11,16 +11,18 @@
 /// @brief Process a single word, updating its frequency
 /// @param word the word to process
 /// @param ht a hash table containing the frequencies of the words found so far
-void process_word(char *word, ioopm_hash_table_t *ht)
+void process_word(elem_t word, ioopm_hash_table_t *ht)
 {
-  int freq = 0;
+  elem_t freq = int_elem(0);
 
   if (ioopm_hash_table_lookup(ht, word, &freq))
   {
-    ioopm_hash_table_insert(ht, word, freq + 1);
+    freq.i += 1;
+    ioopm_hash_table_insert(ht, word, freq);
   } else
   {
-    ioopm_hash_table_insert(ht, strdup(word), freq + 1);
+    freq.i += 1;
+    ioopm_hash_table_insert(ht, string_elem(strdup(word.s)), freq);
   }
 }
 
@@ -30,23 +32,26 @@ void process_word(char *word, ioopm_hash_table_t *ht)
 void process_file(const char *filename, ioopm_hash_table_t *ht)
 {
   FILE *f = fopen(filename, "r");
-  while (true)
+  if (f == NULL)
   {
-    char *buf = NULL;
-    size_t len = 0;
-    if (getline(&buf, &len, f) == -1)
-    {
-      free(buf);
-      break;
-    }
+    perror(filename);
+    return;
+  }
+
+  char *buf = NULL;
+  size_t len = 0;
+
+  while (getline(&buf, &len, f) != -1)
+  {
     for (char *word = strtok(buf, Delimiters);
          word && *word;
          word = strtok(NULL, Delimiters))
     {
-      process_word(word, ht);
+      process_word(string_elem(word), ht);
     }
-    free(buf);
   }
+
+  free(buf);
   fclose(f);
 }
 
@@ -96,7 +101,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
   for (int i = 1; i < argc; ++i)
   {
@@ -113,10 +118,10 @@ int main(int argc, char *argv[])
   while (!ioopm_hash_table_iterator_at_end(it))
   {
     size_t value = ioopm_hash_table_iterator_current_positive_value(it); 
-    char *word = ioopm_hash_table_iterator_current_key(it); 
+    elem_t word = ioopm_hash_table_iterator_current_key(it); 
     
     freq_words[i].freq = value; 
-    freq_words[i].word = word; 
+    freq_words[i].word = word.s; 
     
     i++;
     ioopm_hash_table_iterator_advance(it);

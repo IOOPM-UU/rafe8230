@@ -62,7 +62,7 @@ void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it)
 }
 
 
-char *ioopm_hash_table_iterator_current_key(const ioopm_hash_table_iterator_t *it)
+elem_t ioopm_hash_table_iterator_current_key(const ioopm_hash_table_iterator_t *it)
 {
     return it->current_entry->key;
 }

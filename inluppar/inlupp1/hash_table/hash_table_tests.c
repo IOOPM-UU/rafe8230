@@ -2,6 +2,7 @@
 #include "hash_table.h"
 #include <stdbool.h>
 #include <assert.h>
+#include "common.h"
 
 int init_suite(void) {
   // Change this function if you want to do something *before* you
@@ -17,25 +18,25 @@ int clean_suite(void) {
 
 void test_create_destroy(void)
 {
-   ioopm_hash_table_t *ht = ioopm_hash_table_create();
+   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
    CU_ASSERT_PTR_NOT_NULL(ht);
    ioopm_hash_table_destroy(ht);
 }
 
 void test_create_destroy_destroy_with_entries(void)
 {
-   ioopm_hash_table_t *ht = ioopm_hash_table_create();
+   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
      
-  char *key1 = "a";
+  elem_t key1 = string_elem("a");
   elem_t value1 = int_elem(1); 
   ioopm_hash_table_insert(ht, key1, value1);
 
-  char *key2 = "r";
+  elem_t key2 = string_elem("r");
   elem_t value2 = int_elem(2);
   ioopm_hash_table_insert(ht, key2, value2);
 
-  char *key3 = "at";
+  elem_t key3 = string_elem("at");
   elem_t value3 = int_elem(3);
   ioopm_hash_table_insert(ht, key3, value3);
 
@@ -45,8 +46,8 @@ void test_create_destroy_destroy_with_entries(void)
 
 void test_lookup_entry_exsist(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key = "a";
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
+  elem_t key = string_elem("a");
   elem_t value = int_elem(123);
 
   elem_t result = int_elem(0); 
@@ -62,10 +63,10 @@ void test_lookup_entry_exsist(void)
 
 void test_lookup_entry_no_exsist(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  char *key_dummy = "a";
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
+  elem_t key_dummy = string_elem("a");
   elem_t value_dummy = int_elem(1);
-  char *key = "b";
+  elem_t key = string_elem("b");
   
   elem_t result = int_elem(0); 
   ioopm_hash_table_insert(ht, key_dummy, value_dummy);
@@ -81,9 +82,9 @@ void test_lookup_entry_no_exsist(void)
 void test_insert_once(void)
 {
   // create new hash table
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
-  char *key = "abc";
+  elem_t key = string_elem("abc");
   elem_t value = int_elem(123);
 
   // check that key is not in ht
@@ -103,11 +104,11 @@ void test_insert_once(void)
 void test_insert_twice_same(void)
 {
   // create new hash table
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
-  char *key = "abc";
+  elem_t key = string_elem("abc");
   elem_t value = int_elem(123);
-  char *key_dup = "abc";
+  elem_t key_dup = string_elem("abc");
   elem_t value_dup = int_elem(543);
 
   // check that key is not in ht
@@ -132,13 +133,13 @@ void test_insert_twice_same(void)
 // Remove the first element of a linked list of size two
 void test_remove_entry_first(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
   
-  char *key1 = "a";
+  elem_t key1 = string_elem("a");
   elem_t value1 = int_elem(1); 
   ioopm_hash_table_insert(ht, key1, value1);
 
-  char *key2 = "r";
+  elem_t key2 = string_elem("r");
   elem_t value2 = int_elem(2);
   ioopm_hash_table_insert(ht, key2, value2);
   
@@ -167,17 +168,17 @@ void test_remove_entry_first(void)
 // Remove the midlle most element
 void test_remove_entry_middle(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
   
-  char *key1 = "a";
+  elem_t key1 = string_elem("a");
   elem_t value1 = int_elem(1); 
   ioopm_hash_table_insert(ht, key1, value1);
 
-  char *key2 = "r";
+  elem_t key2 = string_elem("r");
   elem_t value2 = int_elem(2);
   ioopm_hash_table_insert(ht, key2, value2);
 
-  char *key3 = "at";
+  elem_t key3 = string_elem("at");
   elem_t value3 = int_elem(3);
   ioopm_hash_table_insert(ht, key3, value3);
 
@@ -213,9 +214,9 @@ void test_remove_entry_middle(void)
 // Remove the last element of a linked list of size two
 void test_remove_entry_one(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
   
-  char *key1 = "a";
+  elem_t key1 = string_elem("a");
   elem_t value1 = int_elem(1); 
   ioopm_hash_table_insert(ht, key1, value1);
   
@@ -238,13 +239,13 @@ void test_remove_entry_one(void)
 // Remove the last element of a linked list of size two
 void test_remove_entry_last(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
 
-  char *key1 = "a";
+  elem_t key1 = string_elem("a");
   elem_t value1 = int_elem(1); 
   ioopm_hash_table_insert(ht, key1, value1);
 
-  char *key2 = "r";
+  elem_t key2 = string_elem("r");
   elem_t value2 = int_elem(2);
   ioopm_hash_table_insert(ht, key2, value2);
   
@@ -273,8 +274,8 @@ void test_remove_entry_last(void)
 // Try to remove an element in an empty table
 void test_remove_entry_empty_table(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
-  char *key = "a";
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
+  elem_t key = string_elem("a");
   
   elem_t result = int_elem(0); 
 
@@ -291,15 +292,15 @@ void test_remove_entry_empty_table(void)
 
 void test_remove_missing_key_filled_table(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
   
-  char *key_missing = "a";
+  elem_t key_missing = string_elem("a");
 
-  char *key2 = "r";
+  elem_t key2 = string_elem("r");
   elem_t value2 = int_elem(2);
   ioopm_hash_table_insert(ht, key2, value2);
 
-  char *key3 = "at";
+  elem_t key3 = string_elem("at");
   elem_t value3 = int_elem(3);
   ioopm_hash_table_insert(ht, key3, value3);
 
@@ -322,9 +323,9 @@ void test_remove_missing_key_filled_table(void)
 
 void test_has_key_empty_table(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
-  char *key = "a"; 
+  elem_t key = string_elem("a"); 
 
 
   CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, key));
@@ -335,9 +336,9 @@ void test_has_key_empty_table(void)
 
 void test_has_key(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
-  char *key = "a"; 
+  elem_t key = string_elem("a"); 
   elem_t value = int_elem(1);
   ioopm_hash_table_insert(ht, key, value);
 
@@ -349,19 +350,19 @@ void test_has_key(void)
 
 void test_has_multiple_keys(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
-  char *key1 = "a"; 
+  elem_t key1 = string_elem("a"); 
   elem_t value1 = int_elem(1);
   ioopm_hash_table_insert(ht, key1, value1);
 
 
-  char *key2 = "b"; 
+  elem_t key2 = string_elem("b"); 
   elem_t value2 = int_elem(2);
   ioopm_hash_table_insert(ht, key2, value2);
 
 
-  char *key3 = "c"; 
+  elem_t key3 = string_elem("c"); 
   elem_t value3 = int_elem(3);
   ioopm_hash_table_insert(ht, key3, value3);
   
@@ -380,9 +381,9 @@ void test_has_multiple_keys(void)
 
 void test_insert_remove_check_key(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
-  char *key = "a"; 
+  elem_t key = string_elem("a"); 
   elem_t value = int_elem(1);
   ioopm_hash_table_insert(ht, key, value);
 
@@ -399,19 +400,19 @@ void test_insert_remove_check_key(void)
 
 void test_key_insert_three_remove_one(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
-  char *key1 = "a"; 
+  elem_t key1 = string_elem("a"); 
   elem_t value1 = int_elem(1);
   ioopm_hash_table_insert(ht, key1, value1);
 
 
-  char *key2 = "b"; 
+  elem_t key2 = string_elem("b"); 
   elem_t value2 = int_elem(2);
   ioopm_hash_table_insert(ht, key2, value2);
 
 
-  char *key3 = "c"; 
+  elem_t key3 = string_elem("c"); 
   elem_t value3 = int_elem(3);
   ioopm_hash_table_insert(ht, key3, value3);
   
@@ -441,7 +442,7 @@ void test_key_insert_three_remove_one(void)
 
 void test_empty_table_size(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
   CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0); 
 
@@ -450,9 +451,9 @@ void test_empty_table_size(void)
 
 void test_table_size_one(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
-  char *key = "a"; 
+  elem_t key = string_elem("a"); 
   elem_t value = int_elem(0); 
   ioopm_hash_table_insert(ht, key, value); 
 
@@ -463,14 +464,14 @@ void test_table_size_one(void)
 
 void test_table_size_large(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
   char keys[50][8]; 
   size_t i = 0;
   for (; i < 50; i++)
   {
-    snprintf(keys[i], sizeof(keys[i]), "key%zd", i); 
-    ioopm_hash_table_insert(ht, keys[i], int_elem(i));
+    snprintf(keys[i], sizeof(keys[i]), "key%zu", i); 
+    ioopm_hash_table_insert(ht, string_elem(keys[i]), int_elem(i));
   }
   CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), i); 
 
@@ -479,10 +480,10 @@ void test_table_size_large(void)
 
 void test_table_size_remove(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
 
-  char *key1 = "a"; 
-  char *key2 = "b";
+  elem_t key1 = string_elem("a"); 
+  elem_t key2 = string_elem("b");
 
   elem_t value1 = int_elem(1);
   elem_t value2 = int_elem(2);
