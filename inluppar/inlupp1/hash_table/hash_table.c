@@ -32,6 +32,8 @@ static ioopm_entry_t *ioopm_entry_create(elem_t key, elem_t value, ioopm_entry_t
 
 static ioopm_entry_t *entry_destroy(ioopm_entry_t *entry)
 {
+    // Return the entry our current entry is pointing to (next) 
+    // and free the current entry
   ioopm_entry_t *next = entry->next;
   free(entry);
   return next;
@@ -39,15 +41,19 @@ static ioopm_entry_t *entry_destroy(ioopm_entry_t *entry)
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     
+    // Iterate trough each bucket
     for (size_t i = 0; i < No_Buckets; i++)
     {
+        // Set the current entry to the entry after the sentinel node
         ioopm_entry_t *current = ht->buckets[i].next;
+
+        // Destroy each entry in the bucket
         while (current != NULL)
         {
             current = entry_destroy(current);
         }
     }
-    
+    // Free the hash table
     free(ht);
     return;
 }
@@ -57,9 +63,10 @@ ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, elem_t key)
     // find bucket
     size_t bucket = ht->hash_fn(key) % No_Buckets;
     
-    // look for an entry with the key we want
     ioopm_entry_t *previous = &ht->buckets[bucket];
     ioopm_entry_t *current = previous->next;
+    
+    // look for an entry with the key we want then terminate the loop and return prev
     while (current != NULL && !ht->hash_eq_fn(current->key, key) != 0)
     {
         previous = current;
@@ -76,24 +83,26 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
     
     while (current != NULL)
     {
-
+        // Is the current key the same as the one sought after 
         if (ht->hash_eq_fn(current->key, key))
         {
-
-            // case : no middle element and is last elementx
+            // Yes : Update result
             *result = current->value;
+            // Destroy our current entry and make previous point to it 
+            // (since destrying current makes it null, previous->next points to null)
             previous->next = entry_destroy(current);
             ht->ioopm_table_size--;
             return true;
         } else 
         {
+            // NO : Update previous and current, iterate through loop again
             previous = current; 
             current = current->next; 
         }
     }
     
     // the bucket is empty or key is not in bucket
-    *result = int_elem(0); 
+    *result = int_elem(-1); 
     return false;
 }
 
@@ -127,7 +136,7 @@ bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, elem_t key, elem_t *result
     }
     else
     {
-        *result = int_elem(0); 
+        *result = int_elem(-1); 
         return false;
     }
 }
@@ -135,7 +144,7 @@ bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, elem_t key, elem_t *result
 
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key)
 {
-    elem_t result = int_elem(0); 
+    elem_t result = int_elem(-1); 
     return ioopm_hash_table_lookup(ht, key, &result); 
 }
 

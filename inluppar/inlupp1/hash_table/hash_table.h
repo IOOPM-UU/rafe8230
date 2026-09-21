@@ -3,16 +3,17 @@
 #include <stddef.h>
 #include "common.h"
 
+typedef bool ioopm_eq_function(elem_t a, elem_t b);
+typedef size_t ioopm_hash_function(elem_t key);
+
 /**
 * @file hash_table.h
-* @author write both your names here
-* @date write the date you started working on this
+* @author Rasmus Ferngren
+* @date 7 sep 2026
 * @brief Simple hash table that maps string keys to integer values.
 *
-* Here typically goes a more extensive explanation of what the header
-* defines. Doxygens tags are words preceeded by either a backslash @\
-* or by an at symbol @@.
-*
+* Hash table interface
+* A hashtable consists of an array of buckets. Each bucket contains entries. Each entry contains a key, value and pointer to next entry. 
 */
 
 typedef struct hash_table ioopm_hash_table_t;
@@ -39,12 +40,14 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value);
 /// @brief lookup value for key in hash table ht
 /// @param ht hash table operated upon
 /// @param key key to lookup
-/// @return the value mapped to by key (FIXME: what if the key does not exist?)
+/// @param result The value looked at
+/// @return the value mapped to by key (If key does not exsist, result = 0)
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key, elem_t *result);
 
 /// @brief remove any mapping from key to a value
 /// @param ht hash table operated upon
 /// @param key key to remove
+/// @param result The value removed
 /// @return the value mapped to by key, if key does not exsist, result = 0
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result);
 

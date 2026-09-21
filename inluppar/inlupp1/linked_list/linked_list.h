@@ -3,6 +3,17 @@
 #include <stddef.h>
 #include "common.h"
 
+/**
+* @file linked_list.h
+* @author Rasmus Ferngren
+* @date 17 sep 2026
+* @brief A linked list library
+*
+* Each entry is a list containing a value and a pointer to the next index of said list
+*/
+
+
+
 typedef struct list ioopm_list_t; /// Meta: struct definition goes in C file
 
 typedef struct list_entry list_entry_t; 
@@ -42,7 +53,7 @@ elem_t ioopm_list_last(const ioopm_list_t *list);
 /// @pre 0 <= index <= length(list)
 /// @param list the linked list that will be extended
 /// @param index the position in the list
-/// @param value the value to be inserted
+/// @param value the value to be inserted 
 void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value);
 
 /// @brief Remove an element from a linked list in O(n) time.
@@ -51,7 +62,7 @@ void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value);
 /// @pre 0 <= index < length(list)
 /// @param list the linked list
 /// @param index the position in the list
-/// @return the value removed
+/// @return the value removed  (if the list is empty or index > list.size, reuslt = -1)
 elem_t ioopm_list_remove(ioopm_list_t *list, size_t index);
 
 /// @brief Retrieve an element from a linked list in O(n) time.
@@ -60,7 +71,7 @@ elem_t ioopm_list_remove(ioopm_list_t *list, size_t index);
 /// @pre 0 <= index < length(list)
 /// @param list the linked list that will be extended
 /// @param index the position in the list
-/// @return the value at the given position
+/// @return the value at the given position (if the list is empty or index > list.size, reuslt = -1)
 elem_t ioopm_list_get(const ioopm_list_t *list, const size_t index);
 
 /// @brief Lookup the number of elements in the linked list in O(1) time

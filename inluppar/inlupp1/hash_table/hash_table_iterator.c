@@ -26,6 +26,8 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
 
 static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *it)
 {
+    // While current bucket is not equal to the amount of buckets 
+    // and the current entry is a sentinel node
   while (it->current_bucket != No_Buckets &&
          it->current_entry == &it->ht->buckets[it->current_bucket])
   {

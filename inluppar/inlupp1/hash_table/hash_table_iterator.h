@@ -5,8 +5,8 @@
 
 /**
 * @file hash_table_iterator.h
-* @author write both your names here
-* @date 1 Sep 2022
+* @author Rasmus Ferngren
+* @date 7 sep 2026
 * @brief Simple hash table iterator
 *
 * Hash table iterators provide an interface to iterate through all entries in a hash table.
@@ -15,6 +15,7 @@
 *
 */
 
+/// @brief hash table iterator struct
 typedef struct hash_table_iterator ioopm_hash_table_iterator_t;
 
 struct hash_table_iterator

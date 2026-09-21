@@ -15,14 +15,14 @@ void process_word(elem_t word, ioopm_hash_table_t *ht)
 {
   elem_t freq = int_elem(0);
 
+  // If the word already exsists in the ht, increase freq else add the word and init freq to 1
   if (ioopm_hash_table_lookup(ht, word, &freq))
   {
     freq.i += 1;
     ioopm_hash_table_insert(ht, word, freq);
   } else
   {
-    freq.i += 1;
-    ioopm_hash_table_insert(ht, string_elem(strdup(word.s)), freq);
+    ioopm_hash_table_insert(ht, string_elem(strdup(word.s)), int_elem(1));
   }
 }
 
@@ -32,6 +32,8 @@ void process_word(elem_t word, ioopm_hash_table_t *ht)
 void process_file(const char *filename, ioopm_hash_table_t *ht)
 {
   FILE *f = fopen(filename, "r");
+
+  // Is file empty?
   if (f == NULL)
   {
     perror(filename);
@@ -41,6 +43,7 @@ void process_file(const char *filename, ioopm_hash_table_t *ht)
   char *buf = NULL;
   size_t len = 0;
 
+  // Iterate through each word and add it to the ht
   while (getline(&buf, &len, f) != -1)
   {
     for (char *word = strtok(buf, Delimiters);
@@ -95,23 +98,30 @@ void sort_freq_words(struct freq_word words[], size_t no_words)
 
 int main(int argc, char *argv[])
 {
+  // Check arguments
   if (argc < 2)
   {
     printf("Usage: %s file1 ... filen", argv[0]);
     return 1;
   }
 
+  // Create hash table
   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
 
+  // Iterate over all arguments and process their files
   for (int i = 1; i < argc; ++i)
   {
+    // stores all words from a file in a ht
+    // The key is the word
+    // The value is the freq of the word
     process_file(argv[i], ht);
   }
 
+  // Create an array where each index contains a word and its frequency 
   size_t size = ioopm_hash_table_size(ht);
   struct freq_word freq_words[size];
 
-  // FIXME: Iterate over hash table to dump its words and
+  // Iterate over hash table to dump its words and
   // frequencies into the array above
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
   int i = 0;
@@ -120,6 +130,8 @@ int main(int argc, char *argv[])
     size_t value = ioopm_hash_table_iterator_current_positive_value(it); 
     elem_t word = ioopm_hash_table_iterator_current_key(it); 
     
+    // Place the value and word in the created array
+    // The value is the freq of the word
     freq_words[i].freq = value; 
     freq_words[i].word = word.s; 
     
@@ -129,14 +141,15 @@ int main(int argc, char *argv[])
   
   sort_freq_words(freq_words, size);
 
+  // Print the result of the sorted array
   for (size_t i = 0; i < size; ++i)
   {
     printf("%s: %zd\n", freq_words[i].word, freq_words[i].freq);
+
+    // Free the allocaded memory after print
     free(freq_words[i].word); 
   }
 
-  // FIXME: Leaks memory! Use valgrind to find out where that memory is
-  // being allocated, and then insert code here to free it.
   ioopm_hash_table_iterator_destroy(it);
   ioopm_hash_table_destroy(ht);
 }
