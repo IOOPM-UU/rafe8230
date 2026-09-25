@@ -128,6 +128,26 @@ gprof ./hash_table/frec_count gmon.out > frec_analysis.txt
 **Note:** `-pg` should be removed from `CFLAGS` again afterwards, since it slows
 the program down considerably.
 
+## Coverage
+
+To test the coverage of the tests, `--coverage` has to be added to `CFLAGS` in the Makefile
+
+then
+
+```bash
+make clean && make coverage
+```
+
+4 .gcov files are createad inside ./analysis_files 
+
+| File | Line coverage | Branch coverage |
+| `hash_table/hash_table.c` | 93.94% | 100% |
+| `hash_table/hash_table_iterator.c` | 100% | 100% |
+| `linked_list/linked_list.c` | 100% | 100% |
+| `linked_list/linked_list_iterator.c` | 100% | 100% |
+
+
+
 ## Design decisions
 
 * **Generic keys and values via `elem_t`** (a union in `common.h`). Since C has

@@ -81,30 +81,41 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
     ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
     ioopm_entry_t *current = previous->next;
 
-    
-    while (current != NULL)
+    // If optimization found due to coverage showing if inside the while loop
+    // being 0%
+    if (current == NULL)
     {
-        // Is the current key the same as the one sought after 
-        if (ht->hash_eq_fn(current->key, key))
-        {
-            // Yes : Update result
-            *result = current->value;
-            // Destroy our current entry and make previous point to it 
-            // (since destrying current makes it null, previous->next points to null)
-            previous->next = entry_destroy(current);
-            ht->ioopm_table_size--;
-            return true;
-        } else 
-        {
-            // NO : Update previous and current, iterate through loop again
-            previous = current; 
-            current = current->next; 
-        }
+        *result = int_elem(-1); 
+        return false;
     }
     
+    
+    // while (current != NULL)
+    // {
+    //     // Is the current key the same as the one sought after 
+    //     if (ht->hash_eq_fn(current->key, key)) // Dead code and useless check. Because find previous entry does the same check
+    //     {
+    //         // Yes : Update result
+    //         *result = current->value;
+    //         // Destroy our current entry and make previous point to it 
+    //         // (since destrying current makes it null, previous->next points to null)
+    //         previous->next = entry_destroy(current);
+    //         ht->ioopm_table_size--;
+    //         return true;
+    //     } else 
+    //     {
+    //         // NO : Update previous and current, iterate through loop again
+    //         previous = current; 
+    //         current = current->next; 
+    //     }
+    // }
+    
     // the bucket is empty or key is not in bucket
-    *result = int_elem(-1); 
-    return false;
+
+    *result = current->value; 
+    previous->next = entry_destroy(current); 
+    ht->ioopm_table_size--; 
+    return true;
 }
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)

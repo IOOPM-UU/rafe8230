@@ -260,6 +260,7 @@ void test_list_insert_empty(void)
     elem_t value1 = int_elem(1);
 
     ioopm_list_insert(l_list, 0, value1);
+    printf("test"); 
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 1);
     CU_ASSERT_EQUAL(ioopm_list_last(l_list).i, value1.i); 
@@ -327,9 +328,11 @@ void test_list_insert_remove_one(void)
 
     elem_t value1 = int_elem(1);
 
+    
     ioopm_list_insert(l_list, 0, value1);
     CU_ASSERT_EQUAL(ioopm_list_get(l_list, 0).i, value1.i);
-
+    
+    printf("test");
     ioopm_list_remove(l_list, 0);
 
     CU_ASSERT_EQUAL(ioopm_list_size(l_list), 0);

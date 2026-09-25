@@ -118,14 +118,14 @@ static list_entry_t *find_previous_entry(list_entry_t *entry, size_t index)
         return entry;
     }
 
-    return find_previous_entry(entry->next, index--); 
+    return find_previous_entry(entry->next, index - 1); 
 }
 
 void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value)
 {
     // Initialize the entry and previous to entry
     list_entry_t *entry = entry_create(value); 
-    list_entry_t *previous = find_previous_entry(list->sentinel.next, index); 
+    list_entry_t *previous = find_previous_entry(&list->sentinel, index); 
 
     // Make entrys next element previous next element
     entry->next = previous->next;
@@ -140,7 +140,6 @@ void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value)
     }
     
     list->size++; 
-    return;
 }
 
 elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
@@ -152,7 +151,7 @@ elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
     }
     
     // initialize previous and current
-    list_entry_t *previous = find_previous_entry(list->sentinel.next, index); 
+    list_entry_t *previous = find_previous_entry(&list->sentinel, index); 
     list_entry_t *current = previous->next;   
 
     
