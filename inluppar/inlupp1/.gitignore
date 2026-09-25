@@ -1,0 +1,17 @@
+# compiled binaries
+binaries/
+analysis_files/
+
+# object files
+*.o
+
+# coverage data
+*.gcda
+*.gcno
+*.gcov
+
+# profiling data
+gmon.out
+
+# stray output
+a.out
