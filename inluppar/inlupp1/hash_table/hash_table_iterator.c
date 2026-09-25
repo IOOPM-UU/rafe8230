@@ -73,8 +73,3 @@ elem_t ioopm_hash_table_iterator_current_value(const ioopm_hash_table_iterator_t
 {
     return it->current_entry->value;
 }
-
-size_t ioopm_hash_table_iterator_current_positive_value(const ioopm_hash_table_iterator_t *it)
-{
-    return it->current_entry->value.u;
-}

@@ -4,7 +4,6 @@
 #include <string.h>
 #include "hash_table.h"
 #include "hash_table_iterator.h"
-#include "hash_table_private.h"
 
 #define Delimiters "+-#@()[]{}.,:;!? \t\n\r"
 
@@ -127,7 +126,7 @@ int main(int argc, char *argv[])
   int i = 0;
   while (!ioopm_hash_table_iterator_at_end(it))
   {
-    size_t value = ioopm_hash_table_iterator_current_positive_value(it); 
+    size_t value = ioopm_hash_table_iterator_current_value(it).u; 
     elem_t word = ioopm_hash_table_iterator_current_key(it); 
     
     // Place the value and word in the created array
@@ -144,7 +143,15 @@ int main(int argc, char *argv[])
   // Print the result of the sorted array
   for (size_t i = 0; i < size; ++i)
   {
-    printf("%s: %zd\n", freq_words[i].word, freq_words[i].freq);
+    if (i % 10 != 0)
+    {
+      printf("%s: %zd...    ", freq_words[i].word, freq_words[i].freq);
+      
+    } else
+    {
+      printf("%s: %zd\n", freq_words[i].word, freq_words[i].freq);
+    }
+    
 
     // Free the allocaded memory after print
     free(freq_words[i].word); 

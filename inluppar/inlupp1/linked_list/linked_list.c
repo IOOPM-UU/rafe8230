@@ -5,8 +5,8 @@
 #include "linked_list_private.h"
 #include "common.h"
 
-
-
+// gcc -S -O0 -I. linked_list/linked_list.c -o nopt.s     # literal translation
+// gcc -S -O2 -I. linked_list/linked_list.c -o opt.s      # optimised
 
 bool ioopm_list_is_empty(const ioopm_list_t *list)
 {
@@ -28,20 +28,35 @@ list_entry_t *entry_create(elem_t value)
     return entry; 
 }
 
+static void entries_destroy_tail(list_entry_t *entry)
+{
+    if (entry == NULL)
+    {
+        return;
+    }
+    list_entry_t *next = entry->next;
+    free(entry);
+    entries_destroy_tail(next);
+}
+
 void ioopm_list_destroy(ioopm_list_t *list)
 { 
-    // Set current to what the sentinel node points to
-    list_entry_t *entry = list->sentinel.next;
-
-    // Check if the current entry is empty
-    while (entry != NULL)
-    {
-        // update current to next and free current
-        list_entry_t *next = entry->next;
-        free(entry); 
-        entry = next; 
-    }
+    
+    
+    entries_destroy_tail(list->sentinel.next);
     free(list); 
+
+
+    // Set current to what the sentinel node points to
+    // list_entry_t *entry = list->sentinel.next;
+    // // Check if the current entry is empty
+    // while (entry != NULL)
+    // {
+    //     // update current to next and free current
+    //     list_entry_t *next = entry->next;
+    //     free(entry); 
+    //     entry = next; 
+    // }
 }
 void ioopm_list_append(ioopm_list_t *list, elem_t value)
 {
@@ -96,23 +111,21 @@ elem_t ioopm_list_last(const ioopm_list_t *list)
     
 }
 
-static list_entry_t *find_previous_entry(ioopm_list_t *list, const size_t index)
+static list_entry_t *find_previous_entry(list_entry_t *entry, size_t index)
 {
-    list_entry_t *previous = &list->sentinel;
-
-    // Loop over a linked list until weve reached our index
-    for (size_t i = 0; i < index; i++)
+    if (index == 0)
     {
-        previous = previous->next;
+        return entry;
     }
-    return previous;
+
+    return find_previous_entry(entry->next, index--); 
 }
 
 void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value)
 {
     // Initialize the entry and previous to entry
     list_entry_t *entry = entry_create(value); 
-    list_entry_t *previous = find_previous_entry(list, index); 
+    list_entry_t *previous = find_previous_entry(list->sentinel.next, index); 
 
     // Make entrys next element previous next element
     entry->next = previous->next;
@@ -139,7 +152,7 @@ elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
     }
     
     // initialize previous and current
-    list_entry_t *previous = find_previous_entry(list, index); 
+    list_entry_t *previous = find_previous_entry(list->sentinel.next, index); 
     list_entry_t *current = previous->next;   
 
     

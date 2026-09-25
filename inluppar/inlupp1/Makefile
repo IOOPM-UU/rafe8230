@@ -1,5 +1,5 @@
 CC      = gcc
-CFLAGS  = -Wall -Wextra -g -I.
+CFLAGS  = -Wall -Wextra -g -I. -pg
 LDLIBS  = -lcunit
 
 HT      = hash_table
@@ -41,3 +41,9 @@ clean:
 	rm -f $(TESTS) $(HT)/frec_count $(HT)/*.o $(LL)/*.o $(LL)/linked_list_iterator
 
 .PHONY: all test memtest clean
+
+gprof_frec_analysis1:
+	./hash_table/frec_count ./hash_table/big_text.txt > ./hash_table/frec_result.txt
+
+gprof_frec_analysis2:
+	gprof ./hash_table/frec_count gmon.out > frec_analysis.txt
