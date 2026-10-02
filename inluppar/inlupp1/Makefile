@@ -16,6 +16,7 @@ TESTS   = $(BIN)/hash_table_test $(BIN)/hash_table_iterator_test \
           $(BIN)/linked_list_test $(BIN)/linked_list_iterator_test
 
 BIG_TEXT = $(HT)/frec_count_tests/big_text.txt
+MASSIF_IN = hash_table/frec_count_tests/big_text.txt
 
 all: $(TESTS) $(BIN)/$(FC) $(BIN)/$(FC)_O44
 
@@ -63,10 +64,10 @@ profile: clean $(BIN)/$(FC) $(BIN)/$(FC)_O44
 	@for f in $(PROF_IN); do \
 	    name=$$(basename $$f .txt); \
 	    echo "profiling $$name ..."; \
-	    ./$(BIN)/$(FC) $$f > analysis_files/frec_result_$$name.txt; \
-	    gprof -b $(BIN)/$(FC) gmon.out > analysis_files/frec_analysis_$$name.txt; \
-	    ./$(BIN)/$(FC)_O44 $$f > analysis_files/frec_result_O44_$$name.txt; \
-	    gprof -b $(BIN)/$(FC)_O44 gmon.out > analysis_files/frec_analysis_O44_$$name.txt; \
+	    ./$(BIN)/$(FC) $$f > analysis_files/results/frec_result_$$name.txt; \
+	    gprof -b $(BIN)/$(FC) gmon.out > analysis_files/profiles/frec_analysis_$$name.txt; \
+	    ./$(BIN)/$(FC)_O44 $$f > analysis_files/results/frec_result_O44_$$name.txt; \
+	    gprof -b $(BIN)/$(FC)_O44 gmon.out > analysis_files/profiles/frec_analysis_O44_$$name.txt; \
 	done
 	@rm -f gmon.out
 	@echo ""
@@ -84,6 +85,14 @@ coverage: clean $(TESTS)
 	gcov -b $(BIN)/linked_list_iterator_test-linked_list_iterator.gcda
 	mv -f *.gcov $(ANA)/
 	@echo "wrote $(ANA)/*.c.gcov -- run 'make clean' before testing again"
+
+heap_profile: clean $(BIN)/$(FC) $(BIN)/$(FC)_O44
+	mkdir -p $(ANA)/massif
+	valgrind --tool=massif --massif-out-file=$(ANA)/massif/frec_count.massif ./$(BIN)/$(FC) $(MASSIF_IN)
+	valgrind --tool=massif --massif-out-file=$(ANA)/massif/frec_count_O44.massif ./$(BIN)/$(FC)_O44 $(MASSIF_IN)
+	ms_print $(ANA)/massif/frec_count.massif > $(ANA)/massif/frec_count.txt
+	ms_print $(ANA)/massif/frec_count_O44.massif > $(ANA)/massif/frec_count_O44.txt
+	
 
 
 Assembler:

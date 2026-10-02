@@ -165,17 +165,16 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
     {
         previous->next->value = value;
     }
-  else
-  {
-      previous->next = ioopm_entry_create(key, value, NULL);
-      ht->ioopm_table_size++; 
+    else
+    {
+        previous->next = ioopm_entry_create(key, value, NULL);
+        ht->ioopm_table_size++; 
     }
     
     if (ht->ioopm_table_size > prime_at(ht->prime_index) * 0.7)
     {
         ht_grow(ht);
     }
-    
 }
 
 
