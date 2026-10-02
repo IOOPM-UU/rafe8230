@@ -16,8 +16,7 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
   {
     it->current_bucket += 1;
 
-    // if the next bucket existed, update the current entry
-    if (it->current_bucket != No_Buckets)
+    if (it->current_bucket < it->ht->no_buckets)
     {
       it->current_entry = &it->ht->buckets[it->current_bucket];
      }
@@ -26,12 +25,10 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
 
 static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *it)
 {
-    // While current bucket is not equal to the amount of buckets 
-    // and the current entry is a sentinel node
-  while (it->current_bucket != No_Buckets &&
+  while (it->current_bucket < it->ht->no_buckets &&
          it->current_entry == &it->ht->buckets[it->current_bucket])
   {
-    advance_iterator_state(it); 
+    advance_iterator_state(it);
   }
 }
 
@@ -53,7 +50,7 @@ void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *it)
 
 bool ioopm_hash_table_iterator_at_end(const ioopm_hash_table_iterator_t *it)
 {
-    return it->current_bucket == No_Buckets;
+    return it->current_bucket == it->ht->no_buckets;
 }
 
 

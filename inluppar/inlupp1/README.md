@@ -187,3 +187,18 @@ make clean && make coverage
 * **`size_t` is used for all sizes and indices**, which means negative indices
   are impossible by construction. A single `index >= size` check covers both
   ends of the range.
+
+
+## Initial profiling results
+String_eq and string_knr_hash are number 2 and 3 of the most time consuming functions
+As the sample size grows, ioopm_find_previous_entry takes much more time even though 
+it has far less calls than the other two. Optimization ideas might include increasing
+the bucket size (do not have to walk through each list every time we add an element)
+or even better, add a previous struct to the ht struct. This will be like any entry 
+but will always point to the current. This will turn the function to O(1) time complexety. 
+
+Furthermore, the string_eq function is used a large amount of times. A regular comparison 
+operation will be much more efficient. One thing that could solve this is creating a new
+value in the entry struct. This entry will be the hash result of string_knr_hash. 
+Then every entry will have their hash saved. Now we can also easily rehash if we want to
+increase the bucket size. 

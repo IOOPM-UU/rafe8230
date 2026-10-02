@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "hash_table.h"
+#include "hash_table_O44.h"
 #include "hash_table_iterator.h"
 
 #define Delimiters "+-#@()[]{}.,:;!? \t\n\r"
@@ -13,7 +13,7 @@
 void process_word(elem_t word, ioopm_hash_table_t *ht)
 {
   elem_t freq = int_elem(0);
-
+  
   // If the word already exsists in the ht, increase freq else add the word and init freq to 1
   if (ioopm_hash_table_lookup(ht, word, &freq))
   {
@@ -31,23 +31,23 @@ void process_word(elem_t word, ioopm_hash_table_t *ht)
 void process_file(const char *filename, ioopm_hash_table_t *ht)
 {
   FILE *f = fopen(filename, "r");
-
+  
   // Is file empty?
   if (f == NULL)
   {
     perror(filename);
     return;
   }
-
+  
   char *buf = NULL;
   size_t len = 0;
-
+  
   // Iterate through each word and add it to the ht
   while (getline(&buf, &len, f) != -1)
   {
     for (char *word = strtok(buf, Delimiters);
-         word && *word;
-         word = strtok(NULL, Delimiters))
+    word && *word;
+    word = strtok(NULL, Delimiters))
     {
       process_word(string_elem(word), ht);
     }
@@ -104,10 +104,10 @@ int main(int argc, char *argv[])
     printf("Usage: %s file1 ... filen", argv[0]);
     return 1;
   }
-
+  
   // Create hash table
   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
-
+  
   // Iterate over all arguments and process their files
   for (int i = 1; i < argc; ++i)
   {
@@ -116,11 +116,11 @@ int main(int argc, char *argv[])
     // The value is the freq of the word
     process_file(argv[i], ht);
   }
-
+  
   // Create an array where each index contains a word and its frequency 
   size_t size = ioopm_hash_table_size(ht);
   struct freq_word freq_words[size];
-
+  
   // Iterate over hash table to dump its words and
   // frequencies into the array above
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
@@ -138,14 +138,12 @@ int main(int argc, char *argv[])
     i++;
     ioopm_hash_table_iterator_advance(it);
   }
-  
   sort_freq_words(freq_words, size);
 
   // Print the result of the sorted array
   for (size_t i = 0; i < size; ++i)
   {
     printf("%s: %zd\n", freq_words[i].word, freq_words[i].freq);
-    
     // Free the allocaded memory after print
     free(freq_words[i].word); 
   }

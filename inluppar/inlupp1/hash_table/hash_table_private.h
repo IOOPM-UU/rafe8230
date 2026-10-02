@@ -4,6 +4,7 @@
 #include "common.h"
 
 #define No_Buckets 17
+#define No_buckets_2 19319
 
 /**
 * @file hash_table_private.h
@@ -26,7 +27,9 @@ struct entry
 struct hash_table
 {
   // NOTE: No_buckets is hardcoded to be 17
-  ioopm_entry_t buckets[No_Buckets];
+  size_t no_buckets;
+  size_t prime_index;
+  ioopm_entry_t *buckets;
   size_t ioopm_table_size;
   ioopm_hash_function *hash_fn;
   ioopm_eq_function *hash_eq_fn; 

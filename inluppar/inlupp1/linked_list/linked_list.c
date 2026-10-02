@@ -47,7 +47,7 @@ void ioopm_list_destroy(ioopm_list_t *list)
     free(list); 
 
 
-    // Set current to what the sentinel node points to
+    // // Set current to what the sentinel node points to
     // list_entry_t *entry = list->sentinel.next;
     // // Check if the current entry is empty
     // while (entry != NULL)
