@@ -1,13 +1,13 @@
 
 #include <stdio.h>
-#include "hash_table.h"
+#include "hash_table_M39.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "hash_table_private.h"
+#include "hash_table_private_M39.h"
 #include "common.h"
-#include "hash_table_iterator.h"
+#include "hash_table_iterator_M39.h"
 
 
 
@@ -21,7 +21,7 @@ ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *h_fn, ioopm_eq_
     ht->hash_eq_fn = eq_fn;  
     ht->no_buckets = No_Buckets;
     ht->prime_index = 0; 
-    ht->buckets = calloc(No_Buckets, sizeof(ioopm_entry_t));
+    ht->buckets = calloc(No_Buckets, sizeof(ioopm_entry_t *));
     return ht;
 }
 
@@ -49,7 +49,7 @@ static void free_buckets(ioopm_hash_table_t *ht)
 {
     for (size_t i = 0; i < ht->no_buckets; i++)
     {
-        ioopm_entry_t *entry = ht->buckets[i].next;  // skip the dummy
+        ioopm_entry_t *entry = ht->buckets[i];
         while (entry)
         {
             entry = entry_destroy(entry); 
@@ -65,79 +65,54 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 }
 
 
-// Optimization idea - compair pointer values instead of keys, faster comparison aka, take entry as argument not elem_t
-ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, elem_t key)
+ioopm_entry_t **ioopm_find_entry(ioopm_hash_table_t *ht, elem_t key)
 {
     // find bucket
     size_t bucket = ht->hash_fn(key) % ht->no_buckets;
     
-    ioopm_entry_t *previous = &ht->buckets[bucket];
-    ioopm_entry_t *current = previous->next;
+    ioopm_entry_t **entry = &ht->buckets[bucket];
     
     // look for an entry with the key we want then terminate the loop and return prev
-    while (current != NULL && !ht->hash_eq_fn(current->key, key) != 0)
+    while (*entry != NULL && !ht->hash_eq_fn((*entry)->key, key) != 0)
     {
-        previous = current;
-        current = current->next;
+        entry = &(*entry)->next;
     }
-    return previous; 
-}   
 
+    return entry; 
+}   
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
 {
-    ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
-    ioopm_entry_t *current = previous->next;
 
-    // If optimization found due to coverage showing if inside the while loop
-    // being 0%
-    if (current == NULL)
+    ioopm_entry_t **previous_point = ioopm_find_entry(ht, key);
+    if (*previous_point == NULL)
     {
         *result = int_elem(-1); 
         return false;
     }
     
+    ioopm_entry_t *tmp = *previous_point;
     
-    // while (current != NULL)
-    // {
-    //     // Is the current key the same as the one sought after 
-    //     if (ht->hash_eq_fn(current->key, key)) // Dead code and useless check. Because find previous entry does the same check
-    //     {
-    //         // Yes : Update result
-    //         *result = current->value;
-    //         // Destroy our current entry and make previous point to it 
-    //         // (since destrying current makes it null, previous->next points to null)
-    //         previous->next = entry_destroy(current);
-    //         ht->ioopm_table_size--;
-    //         return true;
-    //     } else 
-    //     {
-    //         // NO : Update previous and current, iterate through loop again
-    //         previous = current; 
-    //         current = current->next; 
-    //     }
-    // }
-    
-    // the bucket is empty or key is not in bucket
+    *result = tmp->value;
+    *previous_point = tmp->next; 
+    free(tmp); 
+    ht->ioopm_table_size--;
+    return true; 
 
-    *result = current->value; 
-    previous->next = entry_destroy(current); 
-    ht->ioopm_table_size--; 
-    return true;
 }
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
 {
   // find previous entry, or the last entry if the key does not exist
-  ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key);
+  ioopm_entry_t **previous_point = ioopm_find_entry(ht, key);
 
   // if the key exists, update the value, otherwise create a new entry
-  if (previous->next != NULL)
+  if (*previous_point != NULL)
   {
-    previous->next->value = value;
+    (*previous_point)->value = value;
   }
   else
   {
-    previous->next = ioopm_entry_create(key, value, NULL);
+    *previous_point = ioopm_entry_create(key, value, NULL);
     ht->ioopm_table_size++; 
   }
 }
@@ -147,13 +122,12 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
 // How can we do a lookup with an entry as argument?
 bool ioopm_hash_table_lookup( ioopm_hash_table_t *ht, elem_t key, elem_t *result)
 {
-    ioopm_entry_t *previous = ioopm_find_previous_entry(ht, key); 
-    ioopm_entry_t *current = previous->next; 
+    ioopm_entry_t **previous_point = ioopm_find_entry(ht, key); 
 
     // if the key exists, return the value, otherwise, indicate that the lookup failed
-    if (current != NULL)
+    if (*previous_point != NULL)
     {
-        *result = current->value;
+        *result = (*previous_point)->value;
         return true;
     }
     else

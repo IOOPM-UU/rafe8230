@@ -1,0 +1,207 @@
+#include <CUnit/Basic.h>
+#include "hash_table_M39.h"
+#include <stdbool.h>
+#include <assert.h>
+#include "hash_table_iterator_M39.h"
+#include "hash_table_private_M39.h"
+
+int init_suite(void) {
+  // Change this function if you want to do something *before* you
+  // run a test suite
+  return 0;
+}
+
+int clean_suite(void) {
+  // Change this function if you want to do something *after* you
+  // run a test suite
+  return 0;
+}
+
+void test_iterate_empty_table(void)
+{
+   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
+   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
+   
+   CU_ASSERT_TRUE(ioopm_hash_table_iterator_at_end(it));
+   ioopm_hash_table_iterator_destroy(it);
+    ioopm_hash_table_destroy(ht); 
+}
+
+void test_iterate_table_size_one(void)
+{
+    ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
+    elem_t key = string_elem("a"); 
+    elem_t value = int_elem(1); 
+    ioopm_hash_table_insert(ht, key, value);
+    
+    ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
+    
+    CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it).s, key.s);
+
+    CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it).i, value.i);
+
+    ioopm_hash_table_iterator_destroy(it); 
+    ioopm_hash_table_destroy(ht); 
+}
+
+
+// Only one entry in each bucket
+void test_iterate_table_size_mulitple(void)
+{
+   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
+    
+    char keys[No_Buckets][8]; 
+    
+    for (int i = 0; i < No_Buckets; i++)
+    {
+        snprintf(keys[i], sizeof(keys[i]), "key%d", i); 
+        ioopm_hash_table_insert(ht, string_elem(keys[i]), int_elem(i));
+    }
+
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), No_Buckets);
+
+
+    ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
+    int counter = 0;
+    while (!ioopm_hash_table_iterator_at_end(it))
+    {
+
+        counter++;
+        ioopm_hash_table_iterator_advance(it); 
+    }
+     
+    CU_ASSERT_EQUAL(counter, No_Buckets);
+    ioopm_hash_table_iterator_destroy(it);  
+    ioopm_hash_table_destroy(ht);
+}
+
+// Max one entry in each bucket - also tests advancing between empty buckets
+void test_iterate_table_multiple_checks(void)
+{
+   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
+
+    // No_Buckets does not work because of our hash function
+    char keys[20][8]; 
+
+    // Initialize a large ht
+    for (int i = 0; i < 20; i++)
+    {
+        snprintf(keys[i], sizeof(keys[i]), "key%d", i); 
+        ioopm_hash_table_insert(ht, string_elem(keys[i]), int_elem(i));
+    }
+
+    ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
+    int counter = 0;
+    bool seen[20] = { false };
+    elem_t value = int_elem(0); 
+    while (!ioopm_hash_table_iterator_at_end(it))
+    {
+        // Update value to current and check if its inbounds 
+        value = ioopm_hash_table_iterator_current_value(it);
+        CU_ASSERT_TRUE(value.i >= 0 && value.i < 20);
+
+
+        CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it).s, keys[value.i]);
+        CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it).i, value.i); 
+        
+        // Check and update seen value to true
+        CU_ASSERT_FALSE(seen[value.i]); 
+        seen[value.i] = true; 
+        
+        ioopm_hash_table_iterator_advance(it); 
+        counter++;
+    }
+
+    CU_ASSERT_EQUAL(counter, 20);
+    ioopm_hash_table_iterator_destroy(it);  
+    ioopm_hash_table_destroy(ht);
+}
+
+#define NO_ENTRIES 40
+//Multiple entries in each bucket (or none)
+void test_iterate_table_large_checks(void)
+{
+   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
+
+    // No_Buckets does not work because of our hash function
+    char keys[NO_ENTRIES][8]; 
+
+    // Initialize a large ht
+    for (int i = 0; i < NO_ENTRIES; i++)
+    {
+        snprintf(keys[i], sizeof(keys[i]), "key%u", i); 
+        ioopm_hash_table_insert(ht, string_elem(keys[i]), int_elem(i));
+    }
+
+    ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht); 
+    int counter = 0;
+    bool seen[NO_ENTRIES] = { false };
+    while (!ioopm_hash_table_iterator_at_end(it))
+    {
+        // Update value to current and check if its inbounds 
+        elem_t value = ioopm_hash_table_iterator_current_value(it);
+        CU_ASSERT_TRUE(value.i >= 0 && value.i < NO_ENTRIES);
+
+
+        CU_ASSERT_STRING_EQUAL(ioopm_hash_table_iterator_current_key(it).s, keys[value.i]);
+        CU_ASSERT_EQUAL(ioopm_hash_table_iterator_current_value(it).i, value.i); 
+        
+        // Check and update seen value to true
+        CU_ASSERT_FALSE(seen[value.i]); 
+        seen[value.i] = true; 
+        
+        ioopm_hash_table_iterator_advance(it); 
+        counter++;
+    }
+
+    CU_ASSERT_EQUAL(counter, NO_ENTRIES);
+    ioopm_hash_table_iterator_destroy(it);  
+    ioopm_hash_table_destroy(ht);
+}
+
+
+
+int main(void)
+{
+    // First we try to set up CUnit, and exit if we fail
+    if (CU_initialize_registry() != CUE_SUCCESS)
+    {
+        return CU_get_error();
+    }
+
+    // We then create an empty test suite and specify the name and
+    // the init and cleanup functions
+    CU_pSuite my_test_suite = CU_add_suite("Hash table iterator test:", init_suite, clean_suite);
+    if (my_test_suite == NULL) {
+        // If the test suite could not be added, tear down CUnit and exit
+        CU_cleanup_registry();
+        return CU_get_error();
+    }
+
+     if (
+    (CU_add_test(my_test_suite, "Iterate: Empty table", test_iterate_empty_table) == NULL) ||
+    (CU_add_test(my_test_suite, "Iterate: One entry in table", test_iterate_table_size_one) == NULL) ||
+    (CU_add_test(my_test_suite, "Iterate: Multiple entries, one in each bucket", test_iterate_table_size_mulitple) == NULL) ||
+    (CU_add_test(my_test_suite, "Iterate: Multiple entries, all checked", test_iterate_table_multiple_checks) == NULL) ||
+    (CU_add_test(my_test_suite, "Iterate: Multiple eintreis in each bucket", test_iterate_table_large_checks) == NULL) ||
+    0
+  )
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+      // Set the running mode. Use CU_BRM_VERBOSE for maximum output.
+  // Use CU_BRM_NORMAL to only print errors and a summary
+  CU_basic_set_mode(CU_BRM_VERBOSE);
+
+  // This is where the tests are actually run!
+  CU_basic_run_tests();
+
+  // Tear down CUnit before exiting
+  CU_cleanup_registry();
+        
+    return CU_get_error();
+}
+
+

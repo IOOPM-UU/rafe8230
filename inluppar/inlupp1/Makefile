@@ -9,7 +9,8 @@ BIN     = binaries
 ANA     = analysis_files
 
 HT_SRC  = common.c $(HT)/hash_table.c $(HT)/hash_table_iterator.c
-HT_SRC_O44  = common.c $(HT)/hash_table_O44.c $(HT)/hash_table_iterator.c
+HT_SRC_O44 = common.c $(O44_DIR)/hash_table_O44.c $(HT)/hash_table_iterator.c
+HT_SRC_M39 = common.c $(M39_DIR)/hash_table_M39.c $(M39_DIR)/hash_table_iterator_M39.c
 LL_SRC  = common.c $(LL)/linked_list.c $(LL)/linked_list_iterator.c
 
 TESTS   = $(BIN)/hash_table_test $(BIN)/hash_table_iterator_test \
@@ -17,6 +18,10 @@ TESTS   = $(BIN)/hash_table_test $(BIN)/hash_table_iterator_test \
 
 BIG_TEXT = $(HT)/frec_count_tests/big_text.txt
 MASSIF_IN = hash_table/frec_count_tests/big_text.txt
+CG_DIR = $(ANA)/cachegrind
+O44_DIR    = $(HT)/Achievments/O44
+M39_DIR    = $(HT)/Achievments/M39
+M39_TESTS = $(BIN)/hash_table_test_M39 $(BIN)/hash_table_iterator_test_M39
 
 all: $(TESTS) $(BIN)/$(FC) $(BIN)/$(FC)_O44
 
@@ -34,8 +39,17 @@ $(BIN)/hash_table_iterator_test: $(HT_SRC) $(HT)/hash_table_iterator_tests.c | $
 $(BIN)/$(FC): $(HT_SRC) $(HT)/$(FC).c | $(BIN)
 	$(CC) $(CFLAGS) $^ -o $@
 
-$(BIN)/$(FC)_O44: $(HT_SRC_O44) $(HT)/$(FC)_O44.c | $(BIN)
-	$(CC) $(CFLAGS) $^ -o $@
+# --- achievments ---
+$(BIN)/$(FC)_O44: $(HT_SRC_O44) $(O44_DIR)/$(FC)_O44.c | $(BIN)
+	$(CC) $(CFLAGS) -I$(HT) $^ -o $@
+
+$(BIN)/hash_table_test_M39: $(HT_SRC_M39) $(M39_DIR)/hash_table_tests_M39.c | $(BIN)
+	$(CC) $(CFLAGS) -I$(M39_DIR) $^ $(LDLIBS) -o $@
+
+$(BIN)/hash_table_iterator_test_M39: $(HT_SRC_M39) $(M39_DIR)/hash_table_iterator_tests_M39.c | $(BIN)
+	$(CC) $(CFLAGS) -I$(M39_DIR) $^ $(LDLIBS) -o $@
+
+	
 
 # --- linked list ---
 $(BIN)/linked_list_test: $(LL_SRC) $(LL)/linked_list_test.c | $(BIN)
@@ -47,6 +61,9 @@ $(BIN)/linked_list_iterator_test: $(LL_SRC) $(LL)/linked_list_iterator_test.c | 
 # --- running the tests ---
 test: $(TESTS)
 	for t in $(TESTS); do ./$$t || exit 1; done
+
+test_M39: $(M39_TESTS)
+	for t in $(M39_TESTS); do ./$$t || exit 1; done
 
 memtest: $(TESTS)
 	for t in $(TESTS); do valgrind --leak-check=full --error-exitcode=1 ./$$t || exit 1; done
@@ -92,7 +109,13 @@ heap_profile: clean $(BIN)/$(FC) $(BIN)/$(FC)_O44
 	valgrind --tool=massif --massif-out-file=$(ANA)/massif/frec_count_O44.massif ./$(BIN)/$(FC)_O44 $(MASSIF_IN)
 	ms_print $(ANA)/massif/frec_count.massif > $(ANA)/massif/frec_count.txt
 	ms_print $(ANA)/massif/frec_count_O44.massif > $(ANA)/massif/frec_count_O44.txt
-	
+
+cachegrind_profile: clean $(BIN)/$(FC) $(BIN)/$(FC)_O44
+	mkdir -p $(CG_DIR)
+	valgrind --tool=cachegrind --cachegrind-out-file=$(CG_DIR)/frec_count.cachegrind ./$(BIN)/$(FC) $(MASSIF_IN) > /dev/null
+	valgrind --tool=cachegrind --cachegrind-out-file=$(CG_DIR)/frec_count_O44.cachegrind ./$(BIN)/$(FC)_O44 $(MASSIF_IN) > /dev/null
+	cg_annotate $(CG_DIR)/frec_count.cachegrind > $(CG_DIR)/frec_count_cachegrind.txt
+	cg_annotate $(CG_DIR)/frec_count_O44.cachegrind > $(CG_DIR)/frec_count_O44_cachegrind.txt
 
 
 Assembler:
