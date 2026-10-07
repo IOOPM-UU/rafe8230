@@ -1,6 +1,5 @@
 #pragma once
 #include <stdbool.h>
-#include "db.h"
 
 /**
 * @file common.h
@@ -21,7 +20,6 @@ union elem
   float f;
   void *p;
   char *s;
-  merch_t *m; 
 };
 
 size_t string_knr_hash(elem_t key);

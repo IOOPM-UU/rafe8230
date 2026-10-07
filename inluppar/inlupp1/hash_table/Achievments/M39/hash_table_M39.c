@@ -80,6 +80,7 @@ ioopm_entry_t **ioopm_find_entry(ioopm_hash_table_t *ht, elem_t key)
 
     return entry; 
 }   
+
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
 {
 

@@ -272,14 +272,6 @@ int main(int argc, char *argv[])
          
 
     event_loop(db, &db_siz); 
-    
-
-
-
-
-
-
-
 
   }
   return 0;
