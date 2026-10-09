@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "hash_table_M39.h"
+#include "hash_table_M39_O44.h"
 #include "common.h"
 
 #define No_Buckets 17
@@ -11,7 +11,7 @@
 * @author Rasmus Ferngren
 * @date 15 sep 2026
 * @brief Private file containing structs for hash table interface and iterator interface
-*
+* 
 * A common file for all implementations of hash_table and hash_table_iterator
 *
 */
@@ -27,8 +27,8 @@ struct entry
 struct hash_table
 {
   size_t no_buckets;
-  size_t prime_index; // O44
-  ioopm_entry_t **buckets; // Modified: Array of pointers
+  size_t prime_index;
+  ioopm_entry_t **buckets;
   size_t ioopm_table_size;
   ioopm_hash_function *hash_fn;
   ioopm_eq_function *hash_eq_fn; 

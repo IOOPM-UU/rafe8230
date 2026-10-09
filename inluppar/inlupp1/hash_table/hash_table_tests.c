@@ -130,7 +130,6 @@ void test_insert_twice_same(void)
   ioopm_hash_table_destroy(ht);
 }
 
-// Remove the first element of a linked list of size two
 void test_remove_entry_first(void)
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
@@ -165,7 +164,6 @@ void test_remove_entry_first(void)
   ioopm_hash_table_destroy(ht);
 }
 
-// Remove the midlle most element
 void test_remove_entry_middle(void)
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
@@ -211,7 +209,6 @@ void test_remove_entry_middle(void)
   ioopm_hash_table_destroy(ht);
 }
 
-// Remove the last element of a linked list of size two
 void test_remove_entry_one(void)
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
@@ -235,8 +232,6 @@ void test_remove_entry_one(void)
   ioopm_hash_table_destroy(ht);
 }
 
-
-// Remove the last element of a linked list of size two
 void test_remove_entry_last(void)
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
@@ -271,7 +266,6 @@ void test_remove_entry_last(void)
   ioopm_hash_table_destroy(ht);
 }
 
-// Try to remove an element in an empty table
 void test_remove_entry_empty_table(void)
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq); 
@@ -317,9 +311,6 @@ void test_remove_missing_key_filled_table(void)
 
   ioopm_hash_table_destroy(ht); 
 }
-
-// if we dont find key, set result to 0
-// if we find key, set result to the keys value
 
 void test_has_key_empty_table(void)
 {

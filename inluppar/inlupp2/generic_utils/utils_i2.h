@@ -54,6 +54,6 @@ bool is_size_u(char *str);
 
 int ask_question_size_u(char *question);
 
+int read_string_to_buf(char *buf, const int buf_size, const char *string, const char character);
 
-
-
+void sort_names_alphabetically(char *names[], size_t size); 

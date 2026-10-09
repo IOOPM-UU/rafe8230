@@ -86,7 +86,8 @@ ioopm_entry_t *ioopm_find_previous_entry(ioopm_hash_table_t *ht, elem_t key)
 
 static size_t prime_at(size_t index)
 {
-    static const size_t primes[] = {17, 31, 67, 127, 257, 509, 1021, 2053, 4099, 8191, 16381};
+    static const size_t primes[] = {17, 31, 67, 127, 257, 509, 1021, 2053, 4099, 8191,
+    16381, 32771, 65537, 131071, 262147, 524287, 1048573};
     size_t no_primes = sizeof(primes) / sizeof(primes[0]);
     return index < no_primes ? primes[index] : 0;
 }
@@ -123,7 +124,7 @@ static void ht_grow(ioopm_hash_table_t *ht)
 
 static void ht_shrink(ioopm_hash_table_t *ht)
 {
-    if (prime_at(ht->prime_index) > 0) ht_realloc(ht, ht->prime_index - 1); 
+    if (ht->prime_index > 0) ht_realloc(ht, ht->prime_index - 1);
 }
 
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result)

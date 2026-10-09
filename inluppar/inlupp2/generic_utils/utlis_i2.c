@@ -178,17 +178,12 @@ int ask_question_size_u(char *question) // NEW FUNCTION FOR DATABASE INLUPP2
   return answer.u; 
 }
 
-bool is_shelf(char *input)
+bool is_shelf(char *input) // Edited to fit inlupp 2 description
 {
-    if (*input >= 65 && *input <= 90)
-    {
-        
-        if (is_number(input + 1))
-        {
-            return true;
-        }
-    }
-    return false;
+    return isupper((unsigned char) input[0]) 
+        && is_digit((unsigned char) input[1])
+        && is_digit((unsigned char) input[2])
+        && input[3] == '\0'; 
 }
 
 char *ask_question_shelf(char *question)
@@ -276,4 +271,33 @@ char ask_question_char(char *question)
 {
     answer_t answer = ask_question(question, is_valid_char, make_char);
     return answer.chr;
+}
+
+int read_string_to_buf(char *buf, const int buf_size, const char *string, const char character)
+{
+    int i = 0;
+    while (!(*(string + i) == '\0'))
+    {
+        if (i >= buf_size)
+        {
+            break;
+        }
+    *(buf + i) = *(string + i);
+        i++;
+    }
+    *(buf + i) = character;
+    return i;
+}
+
+// function cmp_names fabricated by Ai:
+static int cmp_names(const void *a, const void *b)
+{
+    const char *s1 = *(char * const *) a;
+    const char *s2 = *(char * const *) b;
+    return strcmp(s1, s2);
+}
+
+void sort_names_alphabetically(char *names[], size_t size)
+{
+    qsort(names, size, sizeof(char *), cmp_names); 
 }
