@@ -4,6 +4,8 @@
 #include "utils_i2.h"
 #include <stdlib.h>
 #include <ctype.h>
+#include "common_i2.h"
+#include "db.h"
 
 
 
@@ -249,7 +251,7 @@ bool is_valid_char(char *str)
         return false;
     }
     
-    char *valid = "LlTtRrGgHhAa";
+    char *valid = "AaLlDdEeSsPpCcRr+-=OoUuQqYyNn";
     while (*valid != '\0')
     {
         if (str[0] == *valid)
@@ -300,4 +302,16 @@ static int cmp_names(const void *a, const void *b)
 void sort_names_alphabetically(char *names[], size_t size)
 {
     qsort(names, size, sizeof(char *), cmp_names); 
+}
+
+static int cmp_shelves(const void *a, const void *b)
+{
+    ioopm_shelf_t *slf_a = *(ioopm_shelf_t **) a;
+    ioopm_shelf_t *slf_b = *(ioopm_shelf_t **) b;
+    return strcmp(slf_a->shelf.s, slf_b->shelf.s);
+}
+
+void sort_shelves_alphabetically(ioopm_shelf_t **slf, size_t size)
+{
+    qsort(slf, size, sizeof(ioopm_shelf_t *), cmp_shelves);
 }

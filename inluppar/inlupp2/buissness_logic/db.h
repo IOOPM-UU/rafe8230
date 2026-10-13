@@ -20,13 +20,15 @@ typedef enum
     DB_INVALID_AMOUNT,
     DB_NO_SUCH_MERCH,
     DB_EMPTY,
-    DB_ALL_LISTED
+    DB_ALL_LISTED,
+    DB_ERROR
 
 } ioopm_db_result_t;
 
 
 typedef struct merch
 {
+    int id; 
     char *name; 
     char *desc;
     int price;
@@ -36,7 +38,9 @@ typedef struct merch
 typedef struct database
 {
     ioopm_hash_table_t *ht_n; 
-    ioopm_hash_table_t *ht_s; 
+    ioopm_hash_table_t *ht_s;
+    ioopm_hash_table_t *name_id_ht; 
+    int next_id;  
 } ioopm_data_base_t;
 
 typedef struct shelf
@@ -68,7 +72,7 @@ typedef struct shelf
 /// @param hf hash function for the keys (merch names and shelf names), e.g. string_knr_hash
 /// @param eq equality function for the keys, e.g. string_eq
 /// @return a pointer to the new database
-ioopm_data_base_t *ioopm_db_create(ioopm_hash_function hf, ioopm_eq_function eq);
+ioopm_data_base_t *ioopm_db_create(ioopm_hash_function hf_s, ioopm_eq_function eq_s, ioopm_hash_function hf_u, ioopm_eq_function eq_u);
 
 /// @brief Creates a merch from already allocated data.
 /// @param name the name of the merch (heap allocated; the merch takes ownership)
@@ -77,7 +81,7 @@ ioopm_data_base_t *ioopm_db_create(ioopm_hash_function hf, ioopm_eq_function eq)
 /// @param shelfs a list of ioopm_shelf_t * (in .p) where the merch is stored;
 ///               the merch takes ownership of the list and its shelves
 /// @return a pointer to the new merch
-merch_t *ioopm_db_item_create(char *name, char *desc, int price, ioopm_list_t *shelfs);
+merch_t *ioopm_db_item_create(ioopm_data_base_t *db, char *name, char *desc, int price, ioopm_list_t *shelfs);
 
 /// @brief Creates a storage location entry for a merch.
 /// @param slf the name of the shelf, e.g. "A25" (heap allocated; the shelf takes ownership)
@@ -118,3 +122,12 @@ void ioopm_db_destroy(ioopm_data_base_t *db);
 ioopm_db_result_t ioopm_db_add_item(ioopm_data_base_t *db, char *name, char *desc, int price);
 
 
+char **ioopm_db_merch_names(ioopm_data_base_t *db, size_t *size);
+
+ioopm_db_result_t ioopm_db_remove_item(ioopm_data_base_t *db, char *name); 
+
+ioopm_db_result_t ioopm_db_edit_merch(ioopm_data_base_t *db, char *name_old, char *name_new, char *desc, int price);
+
+ioopm_db_result_t ioopm_db_item_stock(ioopm_data_base_t *db, char *name, ioopm_shelf_t ***shelves, size_t *size, size_t *total);
+
+ioopm_db_result_t ioopm_db_replenish(ioopm_data_base_t *db, char *name, char *shelf, int amount);

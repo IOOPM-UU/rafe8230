@@ -10,15 +10,17 @@
 #include "linked_list_iterator_i2.h"  
 #include "hash_table_iterator_i2.h"
 
+#pragma region helpers
+
 void print_menu(void)
 {
     printf("\n--- Merchandise ---\n"
            "[A]dd merchandise\n"
-           "[L]ist merchandise : Not yet implemented\n"
-           "[D]elete merchandise : Not yet implemented\n"
-           "[E]dit merchandise : Not yet implemented\n"
-           "[S]how stock : Not yet impelmented\n"
-           "Re[P]lenish : Not yet implemented\n\n"
+           "[L]ist merchandise \n"
+           "[D]elete merchandise \n"
+           "[E]dit merchandise \n"
+           "[S]how stock \n"
+           "Re[P]lenish \n\n"
            "\n--- Shopping carts ---\n"
            "[C]reate cart : Not yet implemented\n"
            "[R]emove cart : Not yet implemented\n"
@@ -45,22 +47,11 @@ char ask_question_menu(char *question)
   return toupper(result);
 }
 
-/*
-void print_item(merch_t *item)
+static void print_names(char **name, size_t strt, size_t end)
 {
-    printf("Name:  %s\n", item->name);
-    printf("Desc:  %s\n", item->desc);
-    printf("Price: %d.%02d SEK\n", item->price / 100, item->price % 100);
-    
-    // TODO: print all shelves and their quantities
-}
-*/
-
-static void print_names(char **name, size_t start, size_t end)
-{
-    for (size_t start = 0; start < end; start++)
+    for (size_t start = strt; start < end; start++)
     {
-        printf("%zu: %s", start, name[start]);
+        printf("\n%zu: %s", start + 1, name[start]);
     }
 }
 
@@ -74,7 +65,6 @@ static ioopm_db_result_t loop_names(char **names, size_t size)
 {
     if (size == 0)
     {
-        printf("No items in database");
         return DB_EMPTY;
     }
 
@@ -95,13 +85,19 @@ static ioopm_db_result_t loop_names(char **names, size_t size)
     return DB_ALL_LISTED;
 }
 
+#pragma endregion
+
+#pragma region backend
+
 void ui_add_merch(ioopm_data_base_t *db)
 {
-    char *name = ask_question_string("Enter name ");
-    char *desc = ask_question_string("Enter description: ");
+    char *name = strdup(ask_question_string("Enter name: "));
+    char *desc = strdup(ask_question_string("Enter description: ")); 
     int price  = ask_question_int("Enter price: ");
 
-    switch (ioopm_db_add_item(db, name, desc, price))
+    ioopm_db_result_t res = ioopm_db_add_item(db, name, desc, price);
+    
+    switch (res)
     {
         case DB_OK:
             printf("%s added\n", name);
@@ -116,8 +112,11 @@ void ui_add_merch(ioopm_data_base_t *db)
             printf("Could not add %s\n", name);
             break;
     }
-    free(desc); 
-    free(name);
+    if (res != DB_OK)
+    {
+        free(name);
+        free(desc);
+    }
 }
 
 void ui_list_merch(ioopm_data_base_t *db)
@@ -130,10 +129,10 @@ void ui_list_merch(ioopm_data_base_t *db)
     switch (loop_names(names, size))
     {
     case DB_EMPTY:
-        printf("No items in database to print");
+        printf("\n\n\nNo items in database to print\n\n\n");
         break;
     case DB_ALL_LISTED:
-        printf("all itesm have been listed"); 
+        printf("\n\n\nall itesm have been listed\n\n\n"); 
         break;
     default:
         break;
@@ -150,8 +149,13 @@ void ui_remove_merch(ioopm_data_base_t *db)
     char answer; 
     do
     {
-        answer = tolower(ask_question_char("Would you like to delete this item [y]/[n]")); 
-    } while (answer != 'y' && answer != 'n');
+        answer = ask_question_char("Would you like to delete this item [y]/[n]: "); 
+        if (tolower(answer) == 'y' || tolower(answer) == 'n')
+        {
+            break; 
+        }
+        
+    } while (true);
 
     if (answer == 'y')
     {
@@ -172,42 +176,58 @@ void ui_remove_merch(ioopm_data_base_t *db)
 
 void ui_edit_merch(ioopm_data_base_t *db)
 {
-    char *u; 
-    u = ask_question_string("Select item to edit: ");
+    char *name_old; 
+    name_old = ask_question_string("Select item to edit: ");
+    
+    char *name_new; 
+    name_new = ask_question_string("Enter name: ");
+    
+    char *desc; 
+    desc = ask_question_string("Enter description: ");
 
-    char answer; 
-    do
-    {
-        answer = tolower(ask_question_char("Would you like to edit this item [y]/[n]")); 
-    } while (answer != 'y' && answer != 'n');
+    int price; 
+    price = ask_question_int("Enter price: "); 
 
-    if (answer == 'y')
+    switch (ioopm_db_edit_merch(db, name_old, name_new, desc, price) /* STUB */)
     {
-        switch (ioopm_db_edit_merch(db, u) /* STUB */)
-        {
         case DB_OK:
-            /* code */
+            break;
+        case DB_INVALID_AMOUNT:
+            break; 
+        case DB_NO_SUCH_MERCH:
             break;
         default:
             break;
-        }
     }
-    free(u); 
+
 }
+
+static void ui_print_shelves_arr(ioopm_shelf_t **shelves, size_t size, size_t total)
+{
+    sort_shelves_alphabetically(shelves, size); 
+
+    ioopm_shelf_t *current = NULL;
+    for (size_t i = 0; i < size; i++)
+    {
+        current = shelves[i];
+        printf("%zu: Name: %s, Amount: %zu", i + 1, current->shelf.s, current->amount); 
+    }
+    
+    printf("Total stock: %zu", total); 
+} 
 
 void ui_show_stock(ioopm_data_base_t *db)
 {
-
     char *name;
     name = ask_question_string("Name item to show: ");
-
     ioopm_shelf_t **shelves;
     size_t size; 
-    
-    switch (ioopm_db_item_stock(db, name, &shelves, &size))
+    size_t total;
+    switch (ioopm_db_item_stock(db, name, &shelves, &size, &total))
     {
     case DB_OK:
-        ui_print_shelves_arr(&shelves, &size); // STUB
+        ui_print_shelves_arr(shelves, size, total); 
+        free(shelves); 
         break;
     case DB_NO_SUCH_MERCH:
         printf("No such merch in database");
@@ -226,13 +246,11 @@ void ui_replenish(ioopm_data_base_t *db)
     char *name = ask_question_string("Merch name: ");
     size_t amount = ask_question_size_u("Amount: ");  
 
-    switch (ioopm_db_replenish(db, name, shelf, amount) /* STUB */)
+    ioopm_db_result_t res = ioopm_db_replenish(db, name, shelf, amount);
+    switch (res)
     {
     case DB_OK:
         printf("\n\n\n Item replenished \n\n\n");
-        break;
-    case DB_SHELF_TAKEN:
-        printf("\n\n\n Shelf occupied\n\n\n"); 
         break;
     case DB_NO_SUCH_MERCH:
         printf("\n\n\n No such merch in database\n\n\n"); 
@@ -243,6 +261,65 @@ void ui_replenish(ioopm_data_base_t *db)
     default:
         break;
     }
-    free(shelf);
-    free(name);
+
+    if (res != DB_OK)
+    {
+        free(shelf);
+        free(name);
+    }
 }
+
+#pragma endregion 
+
+#pragma region carts
+
+void ui_create_cart(ioopm_data_base_t *db)
+{
+    (void) db;
+}     
+
+void ui_remove_cart(ioopm_data_base_t *db)
+{
+    (void) db;
+    
+}
+
+void ui_add_to_cart(ioopm_data_base_t *db)
+{
+    (void) db;
+    
+}    
+
+void ui_remove_from_cart(ioopm_data_base_t *db)
+{
+    (void) db;
+    
+} 
+
+void ui_calculate_cost(ioopm_data_base_t *db)
+{
+    (void) db;
+    
+}
+
+void ui_checkout(ioopm_data_base_t *db)
+{
+    (void) db;
+    
+} 
+
+#pragma endregion
+
+#pragma region others
+void ui_undo(ioopm_data_base_t *db)
+{
+    (void) db;
+    
+}          
+
+bool ui_quit()
+{
+    return false; 
+}
+
+#pragma endregion

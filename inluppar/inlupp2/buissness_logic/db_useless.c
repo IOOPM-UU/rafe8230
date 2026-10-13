@@ -1,7 +1,9 @@
 #include "db.h"
-#include "linked_list_iterator.h"
+#include "linked_list_iterator_i2.h"
 #include "hash_table_iterator_i2.h"
 #include "hash_table_i2.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 
 /*
@@ -45,25 +47,3 @@ ioopm_list_t *ioopm_db_item_all_shelves(merch_t *item)
     
     return names;
 }
-
-char **ioopm_db_merch_names(ioopm_data_base_t *db, size_t *size)
-{
-    *size = ioopm_hash_table_size(db->ht_s); 
-    if (*size == 0)
-    {
-        return NULL; 
-    }
-    
-    char **names = calloc(*size, sizeof(char *)); 
-    ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(db->ht_s);    
-    size_t i = 0; 
-    while (!ioopm_hash_table_iterator_at_end(it))
-    {
-        names[i] = ioopm_hash_table_iterator_current_key(it).s;
-        ioopm_hash_table_iterator_advance(it);
-        i++; 
-    }
-    ioopm_hash_table_iterator_destroy(it);
-    
-    return names; 
-} 

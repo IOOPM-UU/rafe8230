@@ -12,9 +12,9 @@ UI_SRC    = $(wildcard user_interface/*.c)
 BACKEND_SRC = $(DS_SRC) $(UTIL_SRC) $(LOGIC_SRC)
 HEADERS     = $(wildcard */*.h)
 
-.PHONY: all run test memrun memtest clean
+.PHONY: all run test memrun memtest clean shop
 
-all: $(BIN)/shop $(BIN)/db_test
+all: clean $(BIN)/shop $(BIN)/db_test
 
 $(BIN):
 	mkdir -p $(BIN)
@@ -38,6 +38,8 @@ memrun: $(BIN)/shop
 
 memtest: $(BIN)/db_test
 	valgrind --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./$(BIN)/db_test
+
+shop: $(BIN)/shop
 
 clean:
 	rm -rf $(BIN)

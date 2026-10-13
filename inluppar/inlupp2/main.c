@@ -41,7 +41,7 @@ void event_loop(ioopm_data_base_t *db)
 
 int main()
 {
-    ioopm_data_base_t *db = ioopm_db_create(string_knr_hash, string_eq);
+    ioopm_data_base_t *db = ioopm_db_create(string_knr_hash, string_eq, int_hash, int_eq);
     event_loop(db);
     ioopm_db_destroy(db);
     return 0;

@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <db.h>
 
 typedef union {
     int int_value;
@@ -57,3 +58,5 @@ int ask_question_size_u(char *question);
 int read_string_to_buf(char *buf, const int buf_size, const char *string, const char character);
 
 void sort_names_alphabetically(char *names[], size_t size); 
+
+void sort_shelves_alphabetically(ioopm_shelf_t **slf, size_t size);
