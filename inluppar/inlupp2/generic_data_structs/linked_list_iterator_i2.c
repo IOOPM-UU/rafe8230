@@ -1,53 +1,58 @@
-#include "linked_list_i2.h"
 #include "linked_list_iterator_i2.h"
-#include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
-#include "linked_list_private_i2.h"
 #include <assert.h>
-#include "common_i2.h"
+#include "linked_list_private_i2.h"
+#include <stddef.h>
 
-ioopm_list_iterator_t *ioopm_list_iterator_create(ioopm_list_t *l)
-{
-    ioopm_list_iterator_t *it = calloc(1, sizeof(ioopm_list_iterator_t));
-    it->index = 0;
-    it->list = l;
-    it->current_entry = it->list->sentinel.next;
-    it->previous_entry = &it->list->sentinel; 
+struct list_iterator {
+    ioopm_link_t *current;
+    ioopm_list_t *list;
+    ioopm_link_t *previous; // ADDED :
+};
 
-    return it; 
-}
-
-void ioopm_list_iterator_destroy(ioopm_list_iterator_t *it)
-{
-    free(it);
-}
-
-bool ioopm_list_iterator_at_end(const ioopm_list_iterator_t *it)
-{
-    return it->index == it->list->size;
-}
-
-void ioopm_list_iterator_advance(ioopm_list_iterator_t *it)
-{
-    // If the list is at the end and we try to advance
-    // Crash the program
-    assert(!ioopm_list_iterator_at_end(it));
-    it->previous_entry = it->current_entry; 
-    it->current_entry = it->current_entry->next;
-    it->index++; 
-}
-
-elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *it)
-{
-    // if the iterator is at a null list, return -1
-    if (it->current_entry == NULL)
-    {
-        return int_elem(-1); 
-    }
+ioopm_list_iterator_t *ioopm_list_iterator_create(ioopm_list_t *l) {
     
-    return ioopm_list_get(it->list, it->index);
+    assert(l != NULL);
+
+    ioopm_list_iterator_t *iter = calloc(1, sizeof(ioopm_list_iterator_t));
+
+    iter->list = l;
+    iter->previous = l->first; // ADDED : 
+    iter->current = l->first->next;
+
+    return iter;
 }
+
+void ioopm_list_iterator_destroy(ioopm_list_iterator_t *iter) {
+    free(iter);
+}
+
+bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter) {
+    assert(iter != NULL);
+
+    if (iter->current == NULL) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter) {
+    assert(iter != NULL);
+
+    if (iter->current != NULL) {
+        iter->previous = iter->current; 
+        iter->current = iter->current->next;
+    }
+}
+
+elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *iter) {
+    assert(iter != NULL);
+    
+    return iter->current != NULL ? iter->current->element : int_elem(0);
+}
+
 
 elem_t ioopm_list_iterator_remove(ioopm_list_iterator_t *it)
 {
@@ -58,20 +63,20 @@ elem_t ioopm_list_iterator_remove(ioopm_list_iterator_t *it)
     }
 
     // initialize value and current
-    list_entry_t *current = it->current_entry;
-    elem_t value = current->value; 
+    ioopm_link_t *current = it->current;
+    elem_t value = current->element; 
 
     // set previous entry to point at what current points at
-    it->previous_entry->next = current->next;
+    it->previous->next = current->next;
 
     // check if current was last entry, if so update last in list
-    if (it->current_entry == it->list->last)
+    if (it->current == it->list->last)
     {
-        it->list->last = it->previous_entry; 
+        it->list->last = it->previous; 
     }
 
     it->list->size--; 
-    it->current_entry = it->current_entry->next; 
+    it->current = it->current->next; 
     free(current);
     return value; 
 }
@@ -79,13 +84,13 @@ elem_t ioopm_list_iterator_remove(ioopm_list_iterator_t *it)
 void ioopm_list_iterator_insert(ioopm_list_iterator_t *it, elem_t element)
 {
     // Create an entry
-    list_entry_t *entry = entry_create(element); 
+    ioopm_link_t *entry = entry_create(element); 
 
     // make entrys next point to what previous points to
-    entry->next = it->previous_entry->next; 
+    entry->next = it->previous->next; 
 
     // make previous point to entry
-    it->previous_entry->next = entry; 
+    it->previous->next = entry; 
 
     // Check if we are inserting the last element
     if (entry->next == NULL)
@@ -93,6 +98,6 @@ void ioopm_list_iterator_insert(ioopm_list_iterator_t *it, elem_t element)
         it->list->last = entry; 
     }
 
-    it->current_entry = entry; 
+    it->current = entry; 
     it->list->size++; 
 }

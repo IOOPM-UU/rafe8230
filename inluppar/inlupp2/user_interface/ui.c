@@ -22,15 +22,15 @@ void print_menu(void)
            "[S]how stock \n"
            "Re[P]lenish \n\n"
            "\n--- Shopping carts ---\n"
-           "[C]reate cart : Not yet implemented\n"
-           "[R]emove cart : Not yet implemented\n"
-           "[+] Add to cart : Not yet implemented\n"
-           "[-] Remove from cart : Not yet implemented\n"
-           "[=] Calculate cost : Not yet implemented\n"
-           "Check[O]ut : Not yet imlemented\n\n"
+           "[C]reate cart\n"
+           "[R]emove cart \n"
+           "[+] Add to cart \n"
+           "[-] Remove from cart \n"
+           "[=] Calculate cost \n"
+           "Check[O]ut \n\n"
            "\n--- Other ---\n"
            "[U]ndo : Not yet implemented\n"
-           "[Q]uit : Not yet implemented\n");
+           "[Q]uit \n");
 }
 
 char ask_question_menu(char *question)
@@ -85,14 +85,39 @@ static ioopm_db_result_t loop_names(char **names, size_t size)
     return DB_ALL_LISTED;
 }
 
+/// @brief print the ids of all carts
+/// @param db the database
+/// @return a boolean representing if db is empty of carts
+static bool cart_print_start(ioopm_data_base_t *db)
+{
+    ioopm_hash_table_t *carts = ioopm_get_carts(db); 
+    if (ioopm_hash_table_size(carts) == 0)
+    {
+        printf("\n\nNo carts in database\n\n"); 
+        return true; 
+    } 
+    else 
+    {
+        ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(carts);
+        while (!ioopm_hash_table_iterator_at_end(it))
+        {
+            size_t current = ioopm_hash_table_iterator_current_key(it).i;
+            printf("\n%zu", current); 
+            ioopm_hash_table_iterator_advance(it); 
+        }
+        ioopm_hash_table_iterator_destroy(it);
+        printf("\n");
+        return false; 
+    }
+}
 #pragma endregion
 
 #pragma region backend
 
 void ui_add_merch(ioopm_data_base_t *db)
 {
-    char *name = strdup(ask_question_string("Enter name: "));
-    char *desc = strdup(ask_question_string("Enter description: ")); 
+    char *name = ask_question_string("Enter name: ");
+    char *desc = ask_question_string("Enter description: "); 
     int price  = ask_question_int("Enter price: ");
 
     ioopm_db_result_t res = ioopm_db_add_item(db, name, desc, price);
@@ -100,19 +125,19 @@ void ui_add_merch(ioopm_data_base_t *db)
     switch (res)
     {
         case DB_OK:
-            printf("%s added\n", name);
+            printf("\n\n%s added\n\n", name);
             break;
         case DB_NAME_TAKEN:
-            printf("A merch named %s already exists\n", name);  
+            printf("\n\nA merch named %s already exists\n\n", name);  
             break;
         case DB_INVALID_AMOUNT:
-            printf("Invalid price entered");
+            printf("\n\nInvalid price entered\n\n");
             break; 
         default:
-            printf("Could not add %s\n", name);
+            printf("\n\nCould not add %s\n", name);
             break;
     }
-    if (res != DB_OK)
+   if (res != DB_OK)
     {
         free(name);
         free(desc);
@@ -129,10 +154,14 @@ void ui_list_merch(ioopm_data_base_t *db)
     switch (loop_names(names, size))
     {
     case DB_EMPTY:
-        printf("\n\n\nNo items in database to print\n\n\n");
+        printf("\n\nNo items in database to print\n\n");
         break;
     case DB_ALL_LISTED:
-        printf("\n\n\nall itesm have been listed\n\n\n"); 
+        printf("\n\nall itesm have been listed\n\n"); 
+        break;
+    case DB_OK:
+        // All went as user expected
+        // No print needed for confirmation
         break;
     default:
         break;
@@ -157,16 +186,20 @@ void ui_remove_merch(ioopm_data_base_t *db)
         
     } while (true);
 
+    
     if (answer == 'y')
     {
         switch (ioopm_db_remove_item(db, u))
         {
         case DB_OK:
-            printf("%s removed from database", u); 
+            printf("\n\n%s removed from database\n\n", u); 
             break;
         case DB_NO_SUCH_MERCH:
-            printf("%s is not an item within the database", u); 
+            printf("\n\n%s is not an item within the database\n\n", u); 
             break;
+        case DB_ERROR:
+            printf("\n\nThis error should be impossible\n\n"); 
+            break; 
         default:
             break;
         }
@@ -177,31 +210,49 @@ void ui_remove_merch(ioopm_data_base_t *db)
 void ui_edit_merch(ioopm_data_base_t *db)
 {
     char *name_old; 
-    name_old = ask_question_string("Select item to edit: ");
+    name_old = ask_question_string("\n\nSelect item to edit: ");
     
     char *name_new; 
-    name_new = ask_question_string("Enter name: ");
+    name_new = ask_question_string("\n\nEnter name: ");
     
     char *desc; 
-    desc = ask_question_string("Enter description: ");
+    desc = ask_question_string("\n\nEnter description: ");
 
     int price; 
-    price = ask_question_int("Enter price: "); 
+    price = ask_question_int("\n\nEnter price: "); 
 
-    switch (ioopm_db_edit_merch(db, name_old, name_new, desc, price) /* STUB */)
+    ioopm_db_result_t res = ioopm_db_edit_merch(db, name_old, name_new, desc, price);
+    switch (res)
     {
         case DB_OK:
             break;
         case DB_INVALID_AMOUNT:
+            printf("\n\nInvalid amount\n\n"); 
             break; 
         case DB_NO_SUCH_MERCH:
+            printf("\n\nMerch does not exsist\n\n"); 
             break;
+        case DB_NAME_TAKEN:
+            printf("\n\nName already occupied\n\n"); 
+            break; 
         default:
+            printf("\n\nHow did we get here?\n\n");
             break;
     }
+    if (res != DB_OK)
+    {
+        free(name_new);
+        free(desc);
+    }
+    free(name_old);
+    
 
 }
 
+/// @brief Sort and print an array of shelves
+/// @param shelves an array of shelves
+/// @param size the size of the array
+/// @param total amount of the stock for an item
 static void ui_print_shelves_arr(ioopm_shelf_t **shelves, size_t size, size_t total)
 {
     sort_shelves_alphabetically(shelves, size); 
@@ -210,10 +261,12 @@ static void ui_print_shelves_arr(ioopm_shelf_t **shelves, size_t size, size_t to
     for (size_t i = 0; i < size; i++)
     {
         current = shelves[i];
-        printf("%zu: Name: %s, Amount: %zu", i + 1, current->shelf.s, current->amount); 
+        printf("\n%zu: Self: %s, Amount: %zu", i + 1, 
+                ioopm_db_get_shelf(current), 
+                ioopm_db_get__shelf_amount(current)); 
     }
     
-    printf("Total stock: %zu", total); 
+    printf("\nTotal stock: %zu\n\n", total); 
 } 
 
 void ui_show_stock(ioopm_data_base_t *db)
@@ -230,11 +283,14 @@ void ui_show_stock(ioopm_data_base_t *db)
         free(shelves); 
         break;
     case DB_NO_SUCH_MERCH:
-        printf("No such merch in database");
+        printf("\n\nNo such merch in database\n\n");
+        break;
+    case DB_ERROR:
+        printf("\n\nShould not be possible to be here\n\n"); 
         break;
     
     default:
-        printf("Unable to produce item");
+        printf("\n\nUnable to produce item\n\n");
         break;
     }
     free(name); 
@@ -250,23 +306,25 @@ void ui_replenish(ioopm_data_base_t *db)
     switch (res)
     {
     case DB_OK:
-        printf("\n\n\n Item replenished \n\n\n");
+        printf("\n\n Item replenished \n\n");
         break;
     case DB_NO_SUCH_MERCH:
-        printf("\n\n\n No such merch in database\n\n\n"); 
+        printf("\n\n No such merch in database\n\n"); 
         break;
     case DB_INVALID_AMOUNT:
-        printf("\n\n\n Invalid amount input\n\n\n"); 
+        printf("\n\n Invalid amount input\n\n"); 
+        break;
+    case DB_ERROR:
+        printf("\n\nhow did we get here?\n\n"); 
         break;
     default:
+        printf("\n\nWHAT???\n\n");
         break;
     }
 
-    if (res != DB_OK)
-    {
-        free(shelf);
-        free(name);
-    }
+    free(shelf);
+    free(name);
+    
 }
 
 #pragma endregion 
@@ -275,38 +333,183 @@ void ui_replenish(ioopm_data_base_t *db)
 
 void ui_create_cart(ioopm_data_base_t *db)
 {
-    (void) db;
+    ioopm_db_result_t res = ioopm_cart_create(db, string_knr_hash, string_eq); // STUB
+
+    switch (res)
+    {
+    case DB_OK:
+        break;
+    case CART_CREATION_FAILED:
+        printf("\n\nCart was not created\n\n");
+        break;
+    default:
+        printf("\n\nWHAT\n\n"); 
+        break;
+    }
 }     
 
 void ui_remove_cart(ioopm_data_base_t *db)
 {
-    (void) db;
+    if (cart_print_start(db)) return;
+
+    size_t cart = ask_question_size_u("Select the id of the cart to remove: ");
     
+    char answer; 
+    do
+    {
+        answer = ask_question_char("Would you like to delete this cart? [y]/[n]: ");
+        if (answer == 'n') return; 
+    } while (answer != 'y');
+
+    ioopm_db_result_t res = ioopm_cart_destroy(db, cart); // STUB
+
+    switch (res)
+    {
+    case DB_OK:
+        break;
+    case CART_DOES_NOT_EXSIST:
+        printf("\n\nINVALID CART ID\n\n"); 
+        break;
+    default:
+        break;
+    }
 }
 
 void ui_add_to_cart(ioopm_data_base_t *db)
 {
-    (void) db;
+    if (cart_print_start(db)) return;
+    size_t cart = ask_question_size_u("Select the id of the cart to add items to: ");
+
+    char *merch_name = ask_question_string("Select the merch to add: ");
+    size_t amount = ask_question_size_u("Select quantity to add: ");
+
+    ioopm_db_result_t res = ioopm_cart_increase_quantity(db, cart, merch_name, amount); // STUB
+    
+    switch (res)
+    {
+    case DB_OK:
+        break;
+    case DB_OK_NO_MERCH_ADDED: 
+        // Same as db_ok just here for me to free merch_name later
+        break;
+    case CART_DOES_NOT_EXSIST:
+        printf("\n\nCart id does not exist\n\n"); 
+        break;
+    case DB_INVALID_AMOUNT:
+        printf("\n\nInvalid amount, stock not added\n\n");
+        break;
+    case DB_EMPTY:
+        printf("\n\nNo items in database\n\n"); 
+        break;
+    case CART_NOT_ENOUGH_STOCK:
+        printf("\n\nNot enough reserved stock\n\n");
+        break;
+    case DB_ERROR:
+        printf("\n\nhow did we get here? \n\n"); 
+        break;
+    default:
+        printf("\n\nwhat did you do??\n\n"); 
+        break;
+    }
+
+    if (res != DB_OK)
+    {
+        free(merch_name); 
+    }
     
 }    
 
 void ui_remove_from_cart(ioopm_data_base_t *db)
 {
-    (void) db;
+    if (cart_print_start(db)) return;
+    size_t cart = ask_question_size_u("Select the id of the cart to remove items from: ");
+    
+    char *merch_name = ask_question_string("Select the merch to remove items from: ");
+    size_t amount = ask_question_size_u("Select quantity to remove: ");
+    
+    ioopm_db_result_t res = ioopm_cart_decrease_quantity(db, cart, merch_name, amount); // STUB
+    
+    switch (res)
+    {
+    case DB_OK:
+        /* code */
+        break;
+    case CART_DOES_NOT_EXSIST:
+        printf("\n\nCart does not exist\n\n"); 
+        break;
+    case DB_INVALID_AMOUNT:
+        printf("\n\nInvalid quantity\n\n"); 
+        break;
+    case DB_NO_SUCH_MERCH:
+        printf("\n\nNo such merch in cart\n\n"); 
+        break;
+    default:
+        printf("\n\nWHAT??\n\n"); 
+        break;
+    }
+
+    free(merch_name); 
     
 } 
 
 void ui_calculate_cost(ioopm_data_base_t *db)
 {
-    (void) db;
+    if (cart_print_start(db)) return;
+    size_t cart = ask_question_size_u("Select the id of the cart to calculate cost: ");
+
+    size_t cost; 
+    ioopm_db_result_t res = ioopm_cart_calculate_cost(db, cart, &cost); // STUB 
+    
+    switch (res)
+    {
+    case DB_OK:
+        printf("Total: %zu", cost); 
+        break;
+    case CART_DOES_NOT_EXSIST:
+        printf("\n\nNo such cart\n\n"); 
+        break;
+    case CART_EMPTY:
+        printf("\n\nEmpty cart: 0$\n\n"); 
+        break;
+    case DB_ERROR:
+        printf("\n\nNah\n\n"); 
+        break;
+    default:
+        printf("\n\nWHAT THE FUCL\n\n"); 
+        break;
+    }
     
 }
 
 void ui_checkout(ioopm_data_base_t *db)
 {
-    (void) db;
-    
+    if (cart_print_start(db)) return;
+    size_t cart = ask_question_size_u("Select the id of the cart to checkout: ");
+
+    ioopm_db_result_t res = ioopm_cart_checkout(db, cart); // STUB
+    switch (res)
+    {
+    case DB_OK:
+        /* code */
+        break;
+    case CART_DOES_NOT_EXSIST:
+        printf("\n\nInvalid cart id\n\n");
+        break;
+    case DB_NO_SUCH_MERCH:
+        printf("\n\nNo such merch in cart\n\n"); 
+        printf("\nThis should not be possible\n\n"); 
+    break;
+    case DB_ERROR:
+        printf("\n\nwhat?\n\n");
+        break;
+    case CART_EMPTY:
+        printf("\n\nNo items in cart\n\n"); 
+        break;
+    default:
+        break;
+    } 
 } 
+
 
 #pragma endregion
 
@@ -319,7 +522,7 @@ void ui_undo(ioopm_data_base_t *db)
 
 bool ui_quit()
 {
-    return false; 
+    return true; 
 }
 
 #pragma endregion

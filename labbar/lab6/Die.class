@@ -1,0 +1,32 @@
+// Source code is decompiled from a .class file using FernFlower decompiler (from Intellij IDEA).
+import java.util.Scanner;
+
+public class Die {
+   private int numberOfSides;
+   private int value;
+
+   public Die() {
+      this.numberOfSides = 6;
+   }
+
+   public Die(int var1) {
+      this.numberOfSides = var1;
+   }
+
+   public int roll() {
+      this.value = (int)(Math.random() * (double)this.numberOfSides) + 1;
+      return this.get();
+   }
+
+   public int get() {
+      return this.value;
+   }
+
+   public static void main(String[] var0) {
+      Scanner var1 = new Scanner(System.in);
+      System.out.print("Number of sides: ");
+      int var2 = var1.nextInt();
+      Die var3 = new Die(var2);
+      System.out.println("Alea iacta est: " + var3.roll());
+   }
+}

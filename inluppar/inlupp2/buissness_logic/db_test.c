@@ -6,6 +6,17 @@
 #include "db.h"
 #include "linked_list_iterator_i2.h"
 
+#define DB_NAME_ID(db) ioopm_get_name_id_ht(db)
+#define DB_HT_S(db) ioopm_get_ht_s(db)
+#define DB_HT_N(db) ioopm_get_ht_n(db)
+#define DB_CARTS(db) ioopm_get_carts(db)
+#define MERCH_NAME(m) ioopm_get_merch_name(m)
+#define MERCH_DESC(m) ioopm_get_merch_desc(m)
+#define MERCH_PRICE(m) ioopm_get_merch_price(m)
+#define MERCH_ID(m) ioopm_get_merch_id(m)
+#define SHELF_NAME(s) ioopm_db_get_shelf(s)
+#define SHELF_AMOUNT(s) ioopm_db_get_shelf_amount(s)
+
 /*
  * Ownership rules the tests rely on:
  *
@@ -41,12 +52,12 @@ static ioopm_data_base_t *new_db(void)
 static merch_t *lookup_merch(ioopm_data_base_t *db, char *name)
 {
     elem_t id;
-    if (!ioopm_hash_table_lookup(db->name_id_ht, string_elem(name), &id))
+    if (!ioopm_hash_table_lookup(DB_NAME_ID(db), string_elem(name), &id))
     { 
         return NULL;
     }
     elem_t result;
-    if (ioopm_hash_table_lookup(db->ht_s, id, &result))
+    if (ioopm_hash_table_lookup(DB_HT_S(db), id, &result))
     {
         return result.p;
     }
@@ -56,7 +67,7 @@ static merch_t *lookup_merch(ioopm_data_base_t *db, char *name)
 // name_id_ht and ht_s must always hold one entry per merch
 static void assert_tables_consistent(ioopm_data_base_t *db)
 {
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->name_id_ht), ioopm_hash_table_size(db->ht_s));
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_NAME_ID(db)), ioopm_hash_table_size(DB_HT_S(db)));
 }
 
 // Adds a merch, copying the strings so the db can take ownership
@@ -79,9 +90,9 @@ static void assert_new_merch(ioopm_data_base_t *db, char *name, char *desc, int 
 {
     merch_t *m = lookup_merch(db, name);
     CU_ASSERT_PTR_NOT_NULL_FATAL(m);
-    CU_ASSERT_STRING_EQUAL(m->name, name);
-    CU_ASSERT_STRING_EQUAL(m->desc, desc);
-    CU_ASSERT_EQUAL(m->price, price);
+    CU_ASSERT_STRING_EQUAL(MERCH_NAME(m), name);
+    CU_ASSERT_STRING_EQUAL(MERCH_DESC(m), desc);
+    CU_ASSERT_EQUAL(MERCH_PRICE(m), price);
 
     // a new merch is on no shelf, and therefore not in stock
     ioopm_shelf_t **shelves = NULL;
@@ -105,9 +116,9 @@ static int amount_on_shelf(ioopm_data_base_t *db, char *name, char *shelf)
     {
         for (size_t i = 0; i < size; ++i)
         {
-            if (strcmp(shelves[i]->shelf.s, shelf) == 0)
+            if (strcmp(SHELF_NAME(shelves[i]), shelf) == 0)
             {
-                amount = shelves[i]->amount;
+                amount = SHELF_AMOUNT(shelves[i]);
             }
         }
     }
@@ -129,7 +140,7 @@ static size_t shelf_count(ioopm_data_base_t *db, char *name, size_t *total)
 static bool shelf_in_use(ioopm_data_base_t *db, char *shelf)
 {
     elem_t ignored;
-    return ioopm_hash_table_lookup(db->ht_n, string_elem(shelf), &ignored);
+    return ioopm_hash_table_lookup(DB_HT_N(db), string_elem(shelf), &ignored);
 }
 
 // The shelf named location among the first size entries, or NULL
@@ -137,7 +148,7 @@ static ioopm_shelf_t *find_shelf(ioopm_shelf_t **shelves, size_t size, char *loc
 {
     for (size_t i = 0; i < size; ++i)
     {
-        if (strcmp(shelves[i]->shelf.s, location) == 0)
+        if (strcmp(SHELF_NAME(shelves[i]), location) == 0)
         {
             return shelves[i];
         }
@@ -173,9 +184,9 @@ void db_create_is_empty(void)
 {
     ioopm_data_base_t *db = new_db();
     CU_ASSERT_PTR_NOT_NULL_FATAL(db);
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_s));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_n));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->name_id_ht));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_S(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_N(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_NAME_ID(db)));
     ioopm_db_destroy(db);
 }
 
@@ -187,9 +198,9 @@ void db_add_one(void)
 
     CU_ASSERT_EQUAL(add(db, "Apple", "Red fruit", 5), DB_OK);
 
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 1);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 1);
     assert_tables_consistent(db);
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_n));   // no shelves used
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_N(db)));   // no shelves used
     assert_new_merch(db, "Apple", "Red fruit", 5);
 
     ioopm_db_destroy(db);
@@ -203,9 +214,9 @@ void db_add_three(void)
     CU_ASSERT_EQUAL(add(db, "Pear", "Green fruit", 6), DB_OK);
     CU_ASSERT_EQUAL(add(db, "Orange", "Orange fruit", 7), DB_OK);
 
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 3);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 3);
     assert_tables_consistent(db);
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_n));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_N(db)));
     assert_new_merch(db, "Apple", "Red fruit", 5);
     assert_new_merch(db, "Pear", "Green fruit", 6);
     assert_new_merch(db, "Orange", "Orange fruit", 7);
@@ -222,7 +233,7 @@ void db_add_same_name(void)
     CU_ASSERT_EQUAL(add(db, "Apple", "Red and Green fruit", 10), DB_NAME_TAKEN);
 
     // the original is untouched
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 1);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 1);
     assert_tables_consistent(db);
     assert_new_merch(db, "Apple", "Red fruit", 5);
 
@@ -237,7 +248,7 @@ void db_add_same_name_other_case(void)
     CU_ASSERT_EQUAL(add(db, "Apple", "Red fruit", 5), DB_OK);
     CU_ASSERT_EQUAL(add(db, "apple", "Small red fruit", 4), DB_OK);
 
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 2);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 2);
     assert_tables_consistent(db);
     assert_new_merch(db, "apple", "Small red fruit", 4);
 
@@ -278,7 +289,7 @@ void db_add_many(void)
         snprintf(name, sizeof(name), "Item%d", i);
         CU_ASSERT_EQUAL(add(db, name, "Some item", i), DB_OK);
     }
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 50);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 50);
     assert_tables_consistent(db);
 
     for (int i = 0; i < 50; ++i)
@@ -286,7 +297,7 @@ void db_add_many(void)
         snprintf(name, sizeof(name), "Item%d", i);
         merch_t *m = lookup_merch(db, name);
         CU_ASSERT_PTR_NOT_NULL_FATAL(m);
-        CU_ASSERT_EQUAL(m->price, i);
+        CU_ASSERT_EQUAL(MERCH_PRICE(m), i);
     }
 
     ioopm_db_destroy(db);
@@ -298,8 +309,8 @@ void db_add_negative_price(void)
     ioopm_data_base_t *db = new_db();
 
     CU_ASSERT_EQUAL(add(db, "Apple", "Red fruit", -1), DB_INVALID_AMOUNT);
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_s));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->name_id_ht));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_S(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_NAME_ID(db)));
 
     ioopm_db_destroy(db);
 }
@@ -320,9 +331,9 @@ void db_ids_unique(void)
     CU_ASSERT_PTR_NOT_NULL_FATAL(a);
     CU_ASSERT_PTR_NOT_NULL_FATAL(p);
     CU_ASSERT_PTR_NOT_NULL_FATAL(o);
-    CU_ASSERT_NOT_EQUAL(a->id, p->id);
-    CU_ASSERT_NOT_EQUAL(a->id, o->id);
-    CU_ASSERT_NOT_EQUAL(p->id, o->id);
+    CU_ASSERT_NOT_EQUAL(MERCH_ID(a), MERCH_ID(p));
+    CU_ASSERT_NOT_EQUAL(MERCH_ID(a), MERCH_ID(o));
+    CU_ASSERT_NOT_EQUAL(MERCH_ID(p), MERCH_ID(o));
 
     ioopm_db_destroy(db);
 }
@@ -335,10 +346,10 @@ void db_ids_name_maps_to_own_id(void)
     CU_ASSERT_EQUAL(add(db, "Pear", "Green fruit", 6), DB_OK);
 
     elem_t id;
-    CU_ASSERT_TRUE_FATAL(ioopm_hash_table_lookup(db->name_id_ht, string_elem("Apple"), &id));
-    CU_ASSERT_EQUAL(id.i, lookup_merch(db, "Apple")->id);
-    CU_ASSERT_TRUE_FATAL(ioopm_hash_table_lookup(db->name_id_ht, string_elem("Pear"), &id));
-    CU_ASSERT_EQUAL(id.i, lookup_merch(db, "Pear")->id);
+    CU_ASSERT_TRUE_FATAL(ioopm_hash_table_lookup(DB_NAME_ID(db), string_elem("Apple"), &id));
+    CU_ASSERT_EQUAL(id.i, MERCH_ID(lookup_merch(db, "Apple")));
+    CU_ASSERT_TRUE_FATAL(ioopm_hash_table_lookup(DB_NAME_ID(db), string_elem("Pear"), &id));
+    CU_ASSERT_EQUAL(id.i, MERCH_ID(lookup_merch(db, "Pear")));
 
     ioopm_db_destroy(db);
 }
@@ -349,14 +360,14 @@ void db_ids_not_reused_after_remove(void)
     ioopm_data_base_t *db = new_db();
     CU_ASSERT_EQUAL(add(db, "Apple", "Red fruit", 5), DB_OK);
     CU_ASSERT_EQUAL(add(db, "Pear", "Green fruit", 6), DB_OK);
-    int old_apple = lookup_merch(db, "Apple")->id;
-    int pear = lookup_merch(db, "Pear")->id;
+    int old_apple = MERCH_ID(lookup_merch(db, "Apple"));
+    int pear = MERCH_ID(lookup_merch(db, "Pear"));
 
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Apple"), DB_OK);
     CU_ASSERT_EQUAL(add(db, "Apple", "Red fruit", 5), DB_OK);
 
-    CU_ASSERT_NOT_EQUAL(lookup_merch(db, "Apple")->id, old_apple);
-    CU_ASSERT_EQUAL(lookup_merch(db, "Pear")->id, pear);
+    CU_ASSERT_NOT_EQUAL(MERCH_ID(lookup_merch(db, "Apple")), old_apple);
+    CU_ASSERT_EQUAL(MERCH_ID(lookup_merch(db, "Pear")), pear);
     assert_tables_consistent(db);
 
     ioopm_db_destroy(db);
@@ -435,7 +446,7 @@ void db_names_are_not_copies(void)
     size_t size = 0;
     char **names = ioopm_db_merch_names(db, &size);
     CU_ASSERT_EQUAL_FATAL(size, 1);
-    CU_ASSERT_PTR_EQUAL(names[0], lookup_merch(db, "Apple")->name);
+    CU_ASSERT_PTR_EQUAL(names[0], MERCH_NAME(lookup_merch(db, "Apple")));
 
     free(names);
     ioopm_db_destroy(db);
@@ -492,8 +503,8 @@ void db_remove_only_item(void)
 
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Apple"), DB_OK);
     CU_ASSERT_PTR_NULL(lookup_merch(db, "Apple"));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_s));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->name_id_ht));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_S(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_NAME_ID(db)));
 
     ioopm_db_destroy(db);
 }
@@ -508,7 +519,7 @@ void db_remove_missing(void)
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Pear"), DB_NO_SUCH_MERCH);
 
     // nothing was removed
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 1);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 1);
     assert_tables_consistent(db);
     assert_new_merch(db, "Apple", "Red fruit", 5);
 
@@ -550,7 +561,7 @@ void db_remove_one_of_three(void)
 
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Pear"), DB_OK);
 
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 2);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 2);
     assert_tables_consistent(db);
     CU_ASSERT_PTR_NULL(lookup_merch(db, "Pear"));
     assert_new_merch(db, "Apple", "Red fruit", 5);
@@ -568,8 +579,8 @@ void db_remove_all(void)
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Apple"), DB_OK);
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Pear"), DB_OK);
 
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_s));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->name_id_ht));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_S(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_NAME_ID(db)));
 
     size_t size = 123;
     char **names = ioopm_db_merch_names(db, &size);
@@ -624,8 +635,8 @@ void db_remove_with_merch_own_name(void)
     CU_ASSERT_EQUAL_FATAL(size, 1);
 
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, names[0]), DB_OK);
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_s));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->name_id_ht));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_S(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_NAME_ID(db)));
 
     free(names);   // names[0] is now dangling, so only free the array
     ioopm_db_destroy(db);
@@ -648,7 +659,7 @@ void db_remove_many(void)
         CU_ASSERT_EQUAL(ioopm_db_remove_item(db, name), DB_OK);
     }
 
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 25);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 25);
     assert_tables_consistent(db);
     for (int i = 0; i < 50; ++i)
     {
@@ -679,7 +690,7 @@ void db_replenish_new_shelf(void)
     CU_ASSERT_EQUAL(total, 10);
     CU_ASSERT_EQUAL(amount_on_shelf(db, "Apple", "A25"), 10);
 
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_n), 1);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_N(db)), 1);
     CU_ASSERT_TRUE(shelf_in_use(db, "A25"));
 
     ioopm_db_destroy(db);
@@ -694,8 +705,8 @@ void db_replenish_shelf_maps_to_id(void)
     CU_ASSERT_EQUAL(ioopm_db_replenish(db, "Pear", "B12", 3), DB_OK);
 
     elem_t id;
-    CU_ASSERT_TRUE_FATAL(ioopm_hash_table_lookup(db->ht_n, string_elem("B12"), &id));
-    CU_ASSERT_EQUAL(id.i, lookup_merch(db, "Pear")->id);
+    CU_ASSERT_TRUE_FATAL(ioopm_hash_table_lookup(DB_HT_N(db), string_elem("B12"), &id));
+    CU_ASSERT_EQUAL(id.i, MERCH_ID(lookup_merch(db, "Pear")));
 
     ioopm_db_destroy(db);
 }
@@ -712,7 +723,7 @@ void db_replenish_same_shelf_adds(void)
     size_t total = 0;
     CU_ASSERT_EQUAL(shelf_count(db, "Apple", &total), 1);   // still one shelf
     CU_ASSERT_EQUAL(total, 15);
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_n), 1);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_N(db)), 1);
 
     ioopm_db_destroy(db);
 }
@@ -746,7 +757,7 @@ void db_replenish_two_shelves(void)
     CU_ASSERT_EQUAL(total, 13);
     CU_ASSERT_EQUAL(amount_on_shelf(db, "Apple", "A25"), 10);
     CU_ASSERT_EQUAL(amount_on_shelf(db, "Apple", "B12"), 3);
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_n), 2);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_N(db)), 2);
 
     ioopm_db_destroy(db);
 }
@@ -766,7 +777,7 @@ void db_replenish_shelf_taken(void)
     size_t total = 0;
     CU_ASSERT_EQUAL(shelf_count(db, "Pear", &total), 0);
     CU_ASSERT_EQUAL(total, 0);
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_n), 1);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_N(db)), 1);
 
     ioopm_db_destroy(db);
 }
@@ -780,7 +791,7 @@ void db_replenish_no_such_merch(void)
     CU_ASSERT_EQUAL(ioopm_db_replenish(db, "Pear", "A25", 10), DB_NO_SUCH_MERCH);
 
     // the shelf must not be marked as used
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_n));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_N(db)));
 
     ioopm_db_destroy(db);
 }
@@ -791,7 +802,7 @@ void db_replenish_case_sensitive(void)
     CU_ASSERT_EQUAL(add(db, "Apple", "Red fruit", 5), DB_OK);
 
     CU_ASSERT_EQUAL(ioopm_db_replenish(db, "apple", "A25", 10), DB_NO_SUCH_MERCH);
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_n));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_N(db)));
 
     ioopm_db_destroy(db);
 }
@@ -807,7 +818,7 @@ void db_replenish_invalid_amount(void)
 
     size_t total = 0;
     CU_ASSERT_EQUAL(shelf_count(db, "Apple", &total), 0);
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_n));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_N(db)));
 
     ioopm_db_destroy(db);
 }
@@ -867,9 +878,9 @@ void db_replenish_remove_frees_shelves(void)
     CU_ASSERT_EQUAL(ioopm_db_replenish(db, "Apple", "B12", 3), DB_OK);
 
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Apple"), DB_OK);
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_n));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_s));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->name_id_ht));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_N(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_S(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_NAME_ID(db)));
 
     ioopm_db_destroy(db);
 }
@@ -985,8 +996,8 @@ void db_stock_one_shelf(void)
     CU_ASSERT_EQUAL(ioopm_db_item_stock(db, "Apple", &shelves, &size, &total), DB_OK);
     CU_ASSERT_EQUAL_FATAL(size, 1);
     CU_ASSERT_PTR_NOT_NULL_FATAL(shelves);
-    CU_ASSERT_STRING_EQUAL(shelves[0]->shelf.s, "A25");
-    CU_ASSERT_EQUAL(shelves[0]->amount, 10);
+    CU_ASSERT_STRING_EQUAL(SHELF_NAME(shelves[0]), "A25");
+    CU_ASSERT_EQUAL(SHELF_AMOUNT(shelves[0]), 10);
     CU_ASSERT_EQUAL(total, 10);
 
     free(shelves);
@@ -1015,9 +1026,9 @@ void db_stock_many_shelves(void)
     CU_ASSERT_PTR_NOT_NULL_FATAL(a);
     CU_ASSERT_PTR_NOT_NULL_FATAL(b);
     CU_ASSERT_PTR_NOT_NULL_FATAL(c);
-    CU_ASSERT_EQUAL(a->amount, 10);
-    CU_ASSERT_EQUAL(b->amount, 3);
-    CU_ASSERT_EQUAL(c->amount, 7);
+    CU_ASSERT_EQUAL(SHELF_AMOUNT(a), 10);
+    CU_ASSERT_EQUAL(SHELF_AMOUNT(b), 3);
+    CU_ASSERT_EQUAL(SHELF_AMOUNT(c), 7);
     CU_ASSERT_EQUAL(total, 20);
 
     free(shelves);
@@ -1037,7 +1048,7 @@ void db_stock_same_shelf_twice(void)
     size_t total = 0;
     CU_ASSERT_EQUAL(ioopm_db_item_stock(db, "Apple", &shelves, &size, &total), DB_OK);
     CU_ASSERT_EQUAL_FATAL(size, 1);
-    CU_ASSERT_EQUAL(shelves[0]->amount, 15);
+    CU_ASSERT_EQUAL(SHELF_AMOUNT(shelves[0]), 15);
     CU_ASSERT_EQUAL(total, 15);
 
     free(shelves);
@@ -1106,7 +1117,7 @@ void db_stock_does_not_change_db(void)
     CU_ASSERT_EQUAL(ioopm_db_item_stock(db, "Apple", &shelves, &size, &total), DB_OK);
     CU_ASSERT_EQUAL(size, 2);
     CU_ASSERT_EQUAL(total, 13);
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_n), 2);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_N(db)), 2);
 
     free(shelves);
     ioopm_db_destroy(db);
@@ -1157,7 +1168,7 @@ void db_stock_many_shelves_one_merch(void)
         snprintf(shelf, sizeof(shelf), "A%d", i);
         ioopm_shelf_t *s = find_shelf(shelves, size, shelf);
         CU_ASSERT_PTR_NOT_NULL_FATAL(s);
-        CU_ASSERT_EQUAL(s->amount, i);
+        CU_ASSERT_EQUAL(SHELF_AMOUNT(s), i);
     }
 
     free(shelves);
@@ -1186,14 +1197,14 @@ void db_edit_keeps_name_and_id(void)
     CU_ASSERT_EQUAL(add(db, "Apple", "Red fruit", 5), DB_OK);
     merch_t *before = lookup_merch(db, "Apple");
     CU_ASSERT_PTR_NOT_NULL_FATAL(before);
-    int id = before->id;
+    int id = MERCH_ID(before);
 
     CU_ASSERT_EQUAL(edit(db, "Apple", "Apple", "Green fruit", 9), DB_OK);
 
     merch_t *after = lookup_merch(db, "Apple");
     CU_ASSERT_PTR_NOT_NULL_FATAL(after);
     CU_ASSERT_PTR_EQUAL(after, before);
-    CU_ASSERT_EQUAL(after->id, id);
+    CU_ASSERT_EQUAL(MERCH_ID(after), id);
 
     ioopm_db_destroy(db);
 }
@@ -1270,7 +1281,7 @@ void db_edit_one_of_three(void)
     assert_new_merch(db, "Apple", "Red fruit", 5);
     assert_new_merch(db, "Pear", "Yellow fruit", 8);
     assert_new_merch(db, "Orange", "Orange fruit", 7);
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 3);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 3);
     assert_tables_consistent(db);
 
     ioopm_db_destroy(db);
@@ -1330,7 +1341,7 @@ void db_edit_rename(void)
     CU_ASSERT_EQUAL(add(db, "Apple", "Red fruit", 5), DB_OK);
     merch_t *before = lookup_merch(db, "Apple");
     CU_ASSERT_PTR_NOT_NULL_FATAL(before);
-    int id = before->id;
+    int id = MERCH_ID(before);
 
     CU_ASSERT_EQUAL(edit(db, "Apple", "Pear", "Green fruit", 9), DB_OK);
 
@@ -1338,10 +1349,10 @@ void db_edit_rename(void)
     merch_t *after = lookup_merch(db, "Pear");
     CU_ASSERT_PTR_NOT_NULL_FATAL(after);
     CU_ASSERT_PTR_EQUAL(after, before);
-    CU_ASSERT_EQUAL(after->id, id);
+    CU_ASSERT_EQUAL(MERCH_ID(after), id);
     assert_new_merch(db, "Pear", "Green fruit", 9);
 
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 1);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 1);
     assert_tables_consistent(db);
 
     ioopm_db_destroy(db);
@@ -1358,7 +1369,7 @@ void db_edit_rename_name_taken(void)
 
     assert_new_merch(db, "Apple", "Red fruit", 5);
     assert_new_merch(db, "Pear", "Green fruit", 6);
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 2);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 2);
     assert_tables_consistent(db);
 
     ioopm_db_destroy(db);
@@ -1394,8 +1405,8 @@ void db_edit_rename_keeps_stock(void)
     CU_ASSERT_EQUAL(amount_on_shelf(db, "Pear", "A25"), 10);
 
     elem_t id;
-    CU_ASSERT_TRUE_FATAL(ioopm_hash_table_lookup(db->ht_n, string_elem("A25"), &id));
-    CU_ASSERT_EQUAL(id.i, lookup_merch(db, "Pear")->id);
+    CU_ASSERT_TRUE_FATAL(ioopm_hash_table_lookup(DB_HT_N(db), string_elem("A25"), &id));
+    CU_ASSERT_EQUAL(id.i, MERCH_ID(lookup_merch(db, "Pear")));
 
     // and the shelves can still be replenished under the new name
     CU_ASSERT_EQUAL(ioopm_db_replenish(db, "Pear", "A25", 5), DB_OK);
@@ -1414,7 +1425,7 @@ void db_edit_rename_old_name_free(void)
     CU_ASSERT_EQUAL(add(db, "Apple", "New red fruit", 4), DB_OK);
     assert_new_merch(db, "Apple", "New red fruit", 4);
     assert_new_merch(db, "Pear", "Green fruit", 9);
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 2);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 2);
     assert_tables_consistent(db);
 
     ioopm_db_destroy(db);
@@ -1467,9 +1478,9 @@ void db_edit_rename_then_remove(void)
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Apple"), DB_NO_SUCH_MERCH);
     CU_ASSERT_EQUAL(ioopm_db_remove_item(db, "Pear"), DB_OK);
 
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_s));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->name_id_ht));
-    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(db->ht_n));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_S(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_NAME_ID(db)));
+    CU_ASSERT_TRUE(ioopm_hash_table_is_empty(DB_HT_N(db)));
 
     ioopm_db_destroy(db);
 }
@@ -1523,10 +1534,10 @@ void db_edit_rename_many(void)
         CU_ASSERT_PTR_NULL(lookup_merch(db, name));
         merch_t *m = lookup_merch(db, new_name);
         CU_ASSERT_PTR_NOT_NULL_FATAL(m);
-        CU_ASSERT_STRING_EQUAL(m->desc, "Edited item");
-        CU_ASSERT_EQUAL(m->price, i * 2);
+        CU_ASSERT_STRING_EQUAL(MERCH_DESC(m), "Edited item");
+        CU_ASSERT_EQUAL(MERCH_PRICE(m), i * 2);
     }
-    CU_ASSERT_EQUAL(ioopm_hash_table_size(db->ht_s), 50);
+    CU_ASSERT_EQUAL(ioopm_hash_table_size(DB_HT_S(db)), 50);
     assert_tables_consistent(db);
 
     ioopm_db_destroy(db);

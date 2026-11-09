@@ -1,195 +1,176 @@
-#include <stdbool.h>
-#include "linked_list_i2.h"
 #include <stdlib.h>
-#include <stdio.h>
+#include "linked_list_i2.h"
+#include <assert.h>
 #include "linked_list_private_i2.h"
 #include "common_i2.h"
 
-// gcc -S -O0 -I. linked_list/linked_list.c -o nopt.s     # literal translation
-// gcc -S -O2 -I. linked_list/linked_list.c -o opt.s      # optimised
 
-bool ioopm_list_is_empty(const ioopm_list_t *list)
-{
-    return list->size == 0; 
+typedef struct link ioopm_link_t;
+
+ioopm_list_t *ioopm_list_create(void) {
+    
+    ioopm_list_t *list = calloc(1, sizeof(ioopm_list_t));
+
+    if (list != NULL) {
+        
+        ioopm_link_t *dummy = calloc(1, sizeof(ioopm_link_t));
+        
+        list->first = dummy;
+        list->last  = dummy; // Tåget slutar vid dummyn
+        list->size  = 0;
+    }
+
+    return list;
 }
 
-ioopm_list_t *ioopm_list_create(void)
+ioopm_link_t *entry_create(elem_t value) // ADDED : might cause memleak
 {
-    ioopm_list_t *linked_list = calloc(1, sizeof(ioopm_list_t));
-    linked_list->last = &linked_list->sentinel;
-    return linked_list;
-}
-
-list_entry_t *entry_create(elem_t value)
-{
-    list_entry_t *entry = calloc(1, sizeof(list_entry_t));
-    entry->value = value; 
+    ioopm_link_t *entry = calloc(1, sizeof(ioopm_link_t));
+    entry->element = value; 
     entry->next = NULL;
     return entry; 
 }
 
-static void entries_destroy_tail(list_entry_t *entry)
-{
-    if (entry == NULL)
-    {
-        return;
-    }
-    list_entry_t *next = entry->next;
-    free(entry);
-    entries_destroy_tail(next);
-}
-
-void ioopm_list_destroy(ioopm_list_t *list)
-{ 
+void ioopm_list_destroy(ioopm_list_t *list) {
+    ioopm_link_t *current = list->first;
     
-    
-    entries_destroy_tail(list->sentinel.next);
-    free(list); 
-
-
-    // // Set current to what the sentinel node points to
-    // list_entry_t *entry = list->sentinel.next;
-    // // Check if the current entry is empty
-    // while (entry != NULL)
-    // {
-    //     // update current to next and free current
-    //     list_entry_t *next = entry->next;
-    //     free(entry); 
-    //     entry = next; 
-    // }
-}
-void ioopm_list_append(ioopm_list_t *list, elem_t value)
-{
-    // Create the entry to append
-    list_entry_t *entry = entry_create(value);
-    // let the last element of the list point to entry
-    list->last->next = entry;
-    list->size++; 
-    // Set the entry to be the last of the list
-    list->last = entry;
-}
-
-void ioopm_list_prepend(ioopm_list_t *list, elem_t value)
-{
-    // Initialize the new entry
-    list_entry_t *entry = entry_create(value); 
-    // Set the next of our entry to what is after sentinel
-    entry->next = list->sentinel.next;
-    // make sentinels next node be our entry
-    list->sentinel.next = entry; 
-
-    // Check if list is empty before prepend
-    // If so, make our entry the last item of the list
-    if (list->size == 0)
-    {
-        list->last = entry; 
-    }
-
-    list->size++;  
-}
-
-elem_t ioopm_list_head(const ioopm_list_t *list)
-{
-    // Retrun -1 if the list is empty
-    if (list->sentinel.next == NULL)
-    {
-        return int_elem(-1);
+    while (current != NULL) {
+        ioopm_link_t *next = current->next;
+        free(current);
+        current = next;
     }
     
-    return list->sentinel.next->value; 
-    
+    free(list);
 }
 
-elem_t ioopm_list_last(const ioopm_list_t *list)
-{
-    // Return -1 if the list is empty
-    if (list->sentinel.next == NULL)
-    {
-        return int_elem(-1);
-    }
-    return list->last->value; 
-    
+size_t ioopm_list_size(ioopm_list_t *list) {
+    return list->size;
 }
 
-static list_entry_t *find_previous_entry(list_entry_t *entry, size_t index)
-{
-    if (index == 0)
-    {
-        return entry;
-    }
+void ioopm_list_append(ioopm_list_t *list, elem_t value) {
+    ioopm_link_t *new_link = calloc(1, sizeof(ioopm_link_t));
 
-    return find_previous_entry(entry->next, index - 1); 
+    if (new_link != NULL) {
+        new_link->element = value;
+
+        list->last->next = new_link;
+
+        list->last = new_link;
+        list->size++;
+    }
 }
 
-void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value)
-{
-    // Initialize the entry and previous to entry
-    list_entry_t *entry = entry_create(value); 
-    list_entry_t *previous = find_previous_entry(&list->sentinel, index); 
-
-    // Make entrys next element previous next element
-    entry->next = previous->next;
-    // Make previous next element our entry
-    previous->next = entry;
-
-    // Look if its the last element of our list
-    // If so, update last to our entry
-    if (index == list->size)
-    {
-        list->last = entry;
-    }
+void ioopm_list_prepend(ioopm_list_t *list, elem_t value) {
+    ioopm_link_t *new_link = calloc(1, sizeof(ioopm_link_t));
     
-    list->size++; 
+    if (new_link != NULL) {
+        new_link->element = value;
+
+        new_link->next = list->first->next;
+
+        list->first->next = new_link;
+
+        if (list->size == 0) {
+            list->last = new_link;
+        }
+
+        list->size++;
+    }
 }
 
-elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
-{
-    // If the list is empty return -1
-    if (ioopm_list_is_empty(list))
-    {
-        return int_elem(-1); 
+elem_t ioopm_list_head(ioopm_list_t *list) {
+    
+    assert(list->size > 0); 
+    
+    elem_t head = list->first->next->element;
+    return head;
+}
+
+elem_t ioopm_list_last(ioopm_list_t *list) {
+    elem_t last = list->last->element;
+    return last;
+}
+
+void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value) {
+    
+    assert(/*index >= 0 - REMOVED : size_t always > 0 && */ index <= list->size);
+
+    ioopm_link_t *new_link = calloc(1, sizeof(ioopm_link_t));
+    new_link->element = value;
+
+    size_t counter = 0; // EDITED : before; int counter = 0;  
+    ioopm_link_t * current = list->first;
+
+    while (counter != index) {
+        current = current->next;
+
+        counter++;
     }
     
-    // initialize previous and current
-    list_entry_t *previous = find_previous_entry(&list->sentinel, index); 
-    list_entry_t *current = previous->next;   
+    new_link->next = current->next;
+    current->next = new_link;
 
-    
-    // Make previous next element the element current has next
-    previous->next = current->next; 
-    
-    // check if current was the last element in the linked list
-    if (index == list->size - 1)
-    {
-        list->last = previous; 
+    if (index == list->size) {
+        list->last = new_link;
     }
 
-    elem_t value = current->value; 
-    free(current); 
+    list->size++;
+}
+
+elem_t ioopm_list_remove(ioopm_list_t *list, size_t index) {
+
+    assert(/* index >= 0 && - REMOVED : index always > 0 */ index < list->size);
+
+    size_t counter = 0; // EDITED : before; int counter = 0;
+    ioopm_link_t *current = list->first;
+
+    while (counter != index) {
+        current = current->next;
+
+        counter++;
+    }
+    ioopm_link_t *removed_link = current->next;
+
+    elem_t removed_value = removed_link->element;
+
+    current->next = current->next->next;
+
+    if (index == list->size - 1) {
+        list->last = current;
+    }
+
+    free(removed_link);
+
     list->size--;
 
-    return value; 
+    return removed_value;
 }
 
-elem_t ioopm_list_get(const ioopm_list_t *list, const size_t index)
-{
-    list_entry_t *current = list->sentinel.next;
+elem_t ioopm_list_get(ioopm_list_t *list, size_t index) {
 
-    // Check if the list is empty, if so return -1
-    if (list->size == 0 || index > list->size)
-    {
-        return int_elem(-1); 
+    assert(/* index >= 0 && - REMOVED : size_t always > 0*/ index < list->size);
+
+    size_t counter = 0; //    int counter = 0;
+
+    ioopm_link_t *current = list->first;
+
+    while (counter != index) {
+        current = current->next;
+
+        counter++;
     }
-    
-    // Iterate through the list until we get to our desired element
-    for (size_t i = 0; i < index; i++)
-    {
-        current = current->next; 
-    }
-    return current->value;
+
+    return current->next->element;
+
 }
 
-size_t ioopm_list_size(const ioopm_list_t *list)
-{
-    return list->size;
+bool ioopm_list_is_empty(ioopm_list_t *list) {
+
+    if (ioopm_list_size(list) == 0) {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

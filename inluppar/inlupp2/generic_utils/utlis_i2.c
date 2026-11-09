@@ -244,8 +244,7 @@ double ask_question_float(char *question)
 
 bool is_valid_char(char *str)
 {
-    
-    // printf("DEBUG: '%s' (length %zu)\n", str, strlen(str));
+
     if (strlen(str) != 1)
     {
         return false;
@@ -291,7 +290,6 @@ int read_string_to_buf(char *buf, const int buf_size, const char *string, const 
     return i;
 }
 
-// function cmp_names fabricated by Ai:
 static int cmp_names(const void *a, const void *b)
 {
     const char *s1 = *(char * const *) a;
@@ -308,7 +306,9 @@ static int cmp_shelves(const void *a, const void *b)
 {
     ioopm_shelf_t *slf_a = *(ioopm_shelf_t **) a;
     ioopm_shelf_t *slf_b = *(ioopm_shelf_t **) b;
-    return strcmp(slf_a->shelf.s, slf_b->shelf.s);
+    char *na = ioopm_db_get_shelf(slf_a);
+    char *nb = ioopm_db_get_shelf(slf_b);
+    return strcmp(na, nb);
 }
 
 void sort_shelves_alphabetically(ioopm_shelf_t **slf, size_t size)

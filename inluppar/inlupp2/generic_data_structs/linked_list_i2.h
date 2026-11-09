@@ -2,25 +2,18 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "common_i2.h"
-
-/**
-* @file linked_list.h
-* @author Rasmus Ferngren
-* @date 17 sep 2026
-* @brief A linked list library
-*
-* Each entry is a list containing a value and a pointer to the next index of said list
-*/
-
-
+#include "linked_list_private_i2.h"
 
 typedef struct list ioopm_list_t; /// Meta: struct definition goes in C file
-
-typedef struct list_entry list_entry_t; 
 
 /// @brief Creates a new empty list
 /// @return an empty linked list
 ioopm_list_t *ioopm_list_create(void);
+
+/// @brief ADDED : create a memory allocated entry
+/// @param value the value stored 
+/// @return a pointer to the stored memory
+ioopm_link_t *entry_create(elem_t value); 
 
 /// @brief Tear down the linked list and return all its memory (but not the memory of the elements)
 /// @param list the list to be destroyed
@@ -39,12 +32,12 @@ void ioopm_list_prepend(ioopm_list_t *list, elem_t value);
 /// @brief Return the first element of a linked list in O(1) time
 /// @pre the list is non-empty
 /// @param list the linked list to take the head of
-elem_t ioopm_list_head(const ioopm_list_t *list);
+elem_t ioopm_list_head(ioopm_list_t *list);
 
 /// @brief Return the last element of a linked list in O(1) time
 /// @pre the list is non-empty
 /// @param list the linked list to take the last element of
-elem_t ioopm_list_last(const ioopm_list_t *list);
+elem_t ioopm_list_last(ioopm_list_t *list);
 
 /// @brief Insert an element into a linked list in O(n) time.
 /// The valid values of index are [0,n] for a list of n elements,
@@ -53,7 +46,7 @@ elem_t ioopm_list_last(const ioopm_list_t *list);
 /// @pre 0 <= index <= length(list)
 /// @param list the linked list that will be extended
 /// @param index the position in the list
-/// @param value the value to be inserted 
+/// @param value the value to be inserted
 void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value);
 
 /// @brief Remove an element from a linked list in O(n) time.
@@ -62,7 +55,7 @@ void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value);
 /// @pre 0 <= index < length(list)
 /// @param list the linked list
 /// @param index the position in the list
-/// @return the value removed  (if the list is empty or index > list.size, reuslt = -1)
+/// @return the value removed
 elem_t ioopm_list_remove(ioopm_list_t *list, size_t index);
 
 /// @brief Retrieve an element from a linked list in O(n) time.
@@ -71,15 +64,15 @@ elem_t ioopm_list_remove(ioopm_list_t *list, size_t index);
 /// @pre 0 <= index < length(list)
 /// @param list the linked list that will be extended
 /// @param index the position in the list
-/// @return the value at the given position (if the list is empty or index > list.size, reuslt = -1)
-elem_t ioopm_list_get(const ioopm_list_t *list, const size_t index);
+/// @return the value at the given position
+elem_t ioopm_list_get(ioopm_list_t *list, size_t index);
 
 /// @brief Lookup the number of elements in the linked list in O(1) time
 /// @param list the linked list
 /// @return the number of elements in the list
-size_t ioopm_list_size(const ioopm_list_t *list);
+size_t ioopm_list_size(ioopm_list_t *list);
 
 /// @brief Test whether a list is empty or not
 /// @param list the linked list
 /// @return true if the number of elements int the list is 0, else false
-bool ioopm_list_is_empty(const ioopm_list_t *list);
+bool ioopm_list_is_empty(ioopm_list_t *list);

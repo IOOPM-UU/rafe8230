@@ -154,7 +154,6 @@ elem_t ioopm_list_remove(ioopm_list_t *list, size_t index)
     list_entry_t *previous = find_previous_entry(&list->sentinel, index); 
     list_entry_t *current = previous->next;   
 
-    
     // Make previous next element the element current has next
     previous->next = current->next; 
     
