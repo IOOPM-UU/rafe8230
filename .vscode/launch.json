@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "PriorityTest",
+            "request": "launch",
+            "mainClass": "org.ioopm.calculator.PriorityTest",
+            "projectName": "ioopm_41685edd"
+        },
+        {
+            "type": "java",
             "name": "Simulator",
             "request": "launch",
             "mainClass": "labbar.lab7.Simulator",

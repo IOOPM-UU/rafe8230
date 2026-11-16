@@ -8,7 +8,7 @@ public class Store {
     public Store(int amount) {
         this.registers = new Register[amount];
         for (int i = 0; i < this.registers.length; i++) {
-            this.registers[i] = new Register(new Queue());
+            this.registers[i] = new Register(new Queue<Customer>());
         }
         this.registers[0].open();
     }
@@ -90,8 +90,8 @@ public class Store {
         }
     }
 
-    public Queue getDoneCustomers() {
-        Queue empty = new Queue();
+    public Queue<Customer> getDoneCustomers() {
+        Queue<Customer> empty = new Queue<Customer>();
         for (Register register : registers) {
            if (register.currentCustomerIsDone()) {
                 empty.enqueue(register.removeCurrentCustomer());

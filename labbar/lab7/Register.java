@@ -4,9 +4,9 @@ import java.util.EmptyStackException;
 
 public class Register {
     private boolean open;
-    private Queue queue;
-    private Queue done; 
-    public Register(Queue queue) {
+    private Queue<Customer> queue;
+    private Queue<Customer> done; 
+    public Register(Queue<Customer> queue) {
         this.open = false;
         this.queue = queue;
     }
@@ -68,7 +68,7 @@ public class Register {
     }
     public static void main(String[] args) {
         // Open / close
-        Register r = new Register(new Queue());
+        Register r = new Register(new Queue<Customer>());
         System.out.println("New register closed (expect false): " + r.isOpen());
         r.open();
         System.out.println("After open() (expect true): " + r.isOpen());

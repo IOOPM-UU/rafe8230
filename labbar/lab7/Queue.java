@@ -1,12 +1,12 @@
 package labbar.lab7;
 
-public class Queue {
+public class Queue<T> {
     
-    private static class Node {
-        Customer element;
-        Node next;
+    private class Node {
+        private T element;
+        private Node next;
 
-        Node(Customer element) {
+         Node(T element) {
             this.element = element;
             this.next = null;
         }
@@ -26,8 +26,8 @@ public class Queue {
         return this.length;
     }
 
-    public void enqueue(Customer c) {
-        Node n = new Node(c);
+    public void enqueue(T c) {
+       Node n = new Node(c);
         if (this.length == 0) {
             this.first = n;
         } else {
@@ -37,14 +37,14 @@ public class Queue {
         this.length++;
     }
 
-    public class EmptyQueueExeption extends RuntimeException {}
+    public static class EmptyQueueExeption extends RuntimeException {}
 
-    public Customer dequeue() {
+    public T dequeue() {
         if (this.first == null) {
             throw new EmptyQueueExeption(); 
         }
 
-        Customer temp = this.first(); 
+        T temp = this.first(); 
         this.first = this.first.next;
         if (this.first == null) {
             this.last = null;
@@ -53,15 +53,15 @@ public class Queue {
         return temp; 
     }
 
-    public Customer first() {
+    public T first() {
         return this.first.element;
     }
 
-    public Customer last() {
+    public T last() {
         return this.last.element; 
     }
     public static void main(String[] args) {
-        Queue q = new Queue();
+        Queue<Customer> q = new Queue<Customer>();
         System.out.println("Empty length (expect 0): " + q.length());
 
         Customer a = new Customer(0, 3);

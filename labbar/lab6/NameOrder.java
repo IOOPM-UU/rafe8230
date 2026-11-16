@@ -8,12 +8,13 @@ public class NameOrder {
         
         System.out.print("Enter the second name: ");
         String name2 = sc.next(); 
-        if (name1.compareToIgnoreCase(name2) == 0) {
-           System.out.println("The names are identical"); 
+        if (name1.compareToIgnoreCase(name2) < 0) {
+           System.out.println(" " + name1 + ", " + name2 + " "); 
+
         }         
         else 
         {
-            System.out.println("The names are not identical");
+            System.out.println("" + name1 + ", " + name2 + "");
         }
    } 
 

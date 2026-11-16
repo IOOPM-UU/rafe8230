@@ -36,7 +36,7 @@ public class Simulation {
             this.store.openNewRegister();
         }
 
-        Queue done = this.store.getDoneCustomers();
+        Queue<Customer> done = this.store.getDoneCustomers();
         while (done.length() > 0) {
             Customer c = done.dequeue();
             int wait = this.time - c.getBornTime();
