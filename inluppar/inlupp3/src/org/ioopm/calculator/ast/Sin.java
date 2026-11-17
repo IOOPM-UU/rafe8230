@@ -31,6 +31,6 @@ public class Sin extends Unary {
     }
     
     public boolean equals(Sin other) {
-        return this.getPriority() == other.getPriority(); 
+        return this.getArg().equals(other.getArg()); 
     }
 }

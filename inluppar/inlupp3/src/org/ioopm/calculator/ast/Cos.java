@@ -33,6 +33,6 @@ public class Cos extends Unary {
     }
     
     public boolean equals(Cos other) {
-        return this.getPriority() == other.getPriority(); 
+        return this.getArg().equals(other.getArg()); 
     }
 }

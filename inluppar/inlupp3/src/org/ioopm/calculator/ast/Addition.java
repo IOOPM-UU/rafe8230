@@ -1,7 +1,5 @@
 package org.ioopm.calculator.ast;
 
-import java.util.HashMap;
-
 import org.ioopm.calculator.parser.Environment;
 
 public class Addition extends Binary { 

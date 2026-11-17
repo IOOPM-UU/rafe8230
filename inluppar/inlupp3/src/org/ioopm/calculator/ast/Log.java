@@ -32,6 +32,6 @@ public class Log extends Unary {
     }
 
     public boolean equals(Log other) {
-        return this.getPriority() == other.getPriority();
+        return this.getArg().equals(other.getArg()); 
     }
 }

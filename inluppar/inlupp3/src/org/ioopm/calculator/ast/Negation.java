@@ -35,6 +35,6 @@ public class Negation extends Unary {
     }
     
     public boolean equals(Negation other) {
-        return this.getPriority() == other.getPriority(); 
+        return this.getArg().equals(other.getArg()); 
     }
 }
