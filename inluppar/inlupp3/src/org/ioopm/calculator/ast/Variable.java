@@ -19,6 +19,6 @@ public class Variable extends Atom {
     }
 
     public boolean equals(Variable other) {
-        return this.identifier == other.identifier;
+        return this.identifier.equals(other.identifier); 
     }
 }

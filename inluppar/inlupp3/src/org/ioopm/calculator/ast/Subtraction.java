@@ -38,6 +38,6 @@ public class Subtraction extends Binary {
     }
 
     public boolean equals(Subtraction other) {
-        return this.getPriority() == other.getPriority(); 
+        return this.getLhs().equals(other.getLhs()) && this.getRhs().equals(other.getRhs());  
     }
 }

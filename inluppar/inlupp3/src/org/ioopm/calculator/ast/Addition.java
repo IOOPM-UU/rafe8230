@@ -35,7 +35,7 @@ public class Addition extends Binary {
     }
 
     public boolean equals(Addition other) {
-        return this.getPriority() == other.getPriority(); 
+        return this.getLhs().equals(other.getLhs()) && this.getRhs().equals(other.getRhs());  
     }
 }
 

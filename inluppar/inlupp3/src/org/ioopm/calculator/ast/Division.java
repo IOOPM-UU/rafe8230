@@ -37,6 +37,6 @@ public class Division extends Binary {
     }
 
     public boolean equals(Division other) {
-        return this.getPriority() == other.getPriority(); 
+        return this.getLhs().equals(other.getLhs()) && this.getRhs().equals(other.getRhs());  
     }
 }

@@ -37,7 +37,8 @@ public class Multiplication extends Binary{
     }
 
     public boolean equals(Multiplication other) {
-        return this.getPriority() == other.getPriority();  
+        return this.getLhs().equals(other.getLhs()) && this.getRhs().equals(other.getRhs());  
     }
+
 }
 
