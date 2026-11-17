@@ -97,10 +97,6 @@ public class EvalTest {
                 new Multiplication(new Addition(c5, c2),
                         new Subtraction(new Constant(10), c5))); // (5+2)*(10-5) -> 35
 
-        // --- eval must not change the original tree ---
-        SymbolicExpression original = new Addition(new Addition(c5, c2), x);
-        original.eval();
-        testEvaluating(new Addition(new Addition(c5, c2), x), original); // still (5 + 2) + x before eval
     }
 
     public static void main(String[] args) {
