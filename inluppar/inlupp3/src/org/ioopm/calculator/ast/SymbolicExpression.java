@@ -22,4 +22,6 @@ public abstract class SymbolicExpression {
     public double getValue() {
         throw new RuntimeException("getValue called on non constant"); 
     }
+
+    public abstract SymbolicExpression eval(); 
 }

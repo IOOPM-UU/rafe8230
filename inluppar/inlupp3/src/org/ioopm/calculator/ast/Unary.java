@@ -15,7 +15,6 @@ public abstract class Unary extends SymbolicExpression {
         return this.arg;
     }
 
-    @Override
     public String toString() {
         String s = this.getName() + " ";
         if (this.getPriority() > this.arg.getPriority()) {
@@ -23,4 +22,9 @@ public abstract class Unary extends SymbolicExpression {
         }
         return s + this.arg;
     }
+
+    public SymbolicExpression eval() {
+        return this.arg.eval(); 
+    }
+    
 }

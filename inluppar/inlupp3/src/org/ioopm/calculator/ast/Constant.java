@@ -12,4 +12,24 @@ public class Constant extends Atom {
     public String toString() {
         return String.valueOf(this.value); 
     }
+
+    public boolean equals(Object other) {
+        if (other instanceof Constant) {
+            return this.equals((Constant) other);  
+        }
+        return false; 
+    }
+    public boolean equals(Constant other) {
+        return this.value == other.value; 
+    }
+
+    public double getValue() {
+        return this.value; 
+    }
+    
+    @Override 
+    public SymbolicExpression eval() {
+        return new Constant(value); 
+    }
 }
+

@@ -16,4 +16,23 @@ public class Negation extends Unary {
         }
         return "-" + this.getArg();
     }
+
+    public SymbolicExpression eval() {
+        SymbolicExpression arg = this.getArg().eval();
+        if (arg.isConstant()) {
+            return new Constant(arg.getValue() * -1); 
+        }
+        return new Negation(arg); 
+    }
+
+    public boolean equals(Object other) {
+        if (other instanceof Negation) {
+            return equals((Negation) other); 
+        }
+        return false; 
+    }
+    
+    public boolean equals(Negation other) {
+        return this.getPriority() == other.getPriority(); 
+    }
 }

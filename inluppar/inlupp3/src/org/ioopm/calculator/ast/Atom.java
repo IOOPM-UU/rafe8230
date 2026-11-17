@@ -5,4 +5,9 @@ public abstract class Atom extends SymbolicExpression {
     public int getPriority() { 
         return 100; 
     }
+
+    public SymbolicExpression eval() {
+        return this;
+    }
+
 }

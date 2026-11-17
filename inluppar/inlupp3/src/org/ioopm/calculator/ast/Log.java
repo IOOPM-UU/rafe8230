@@ -12,4 +12,24 @@ public class Log extends Unary {
     public String toString() {
         return super.toString();
     }
+    @Override 
+    public SymbolicExpression eval() {
+        SymbolicExpression arg = this.getArg().eval(); 
+        if (arg.isConstant()) {
+            return new Constant(Math.log(arg.getValue())); 
+        } else {
+            return new Log(arg); 
+        }
+    }
+
+    public boolean equals(Object other) {
+        if (other instanceof Log) {
+            return equals((Log) other);
+        }
+        return false;
+    }
+
+    public boolean equals(Log other) {
+        return this.getPriority() == other.getPriority();
+    }
 }

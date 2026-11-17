@@ -17,4 +17,8 @@ public class Assignment extends Binary {
     public String toString() {
         return super.toString(); 
     }
+
+    public SymbolicExpression eval() {
+        return getLhs().eval(); 
+    }
 }

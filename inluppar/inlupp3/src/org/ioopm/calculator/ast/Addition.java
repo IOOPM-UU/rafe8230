@@ -14,8 +14,28 @@ public class Addition extends Binary {
         return 70; 
     }
 
-    public String toString() {
-        return super.toString();
+    
+
+    @Override 
+    public SymbolicExpression eval() {
+        SymbolicExpression lArg = this.getLhs().eval();  
+        SymbolicExpression rArg = this.getRhs().eval(); 
+
+        if (lArg.isConstant() && rArg.isConstant()) {
+            return new Constant(lArg.getValue() + rArg.getValue());
+        } 
+        return new Addition(lArg, rArg); 
+    }
+
+    public boolean equals(Object other) {
+        if (!(other instanceof Addition)) {
+            return false; 
+        }
+        return this.equals((Addition) other); 
+    }
+
+    public boolean equals(Addition other) {
+        return this.getPriority() == other.getPriority(); 
     }
 }
 
