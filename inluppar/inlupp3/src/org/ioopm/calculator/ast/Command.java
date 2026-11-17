@@ -1,5 +1,12 @@
 package org.ioopm.calculator.ast;
 
-public class Command extends SymbolicExpression {
+import org.ioopm.calculator.parser.Environment;
+import org.ioopm.calculator.parser.SyntaxErrorException;
 
+public abstract class Command extends SymbolicExpression {
+
+    @Override 
+    public SymbolicExpression eval(Environment vars) {
+        throw new SyntaxErrorException("Commans may not be evaluated"); 
+    }
 }
