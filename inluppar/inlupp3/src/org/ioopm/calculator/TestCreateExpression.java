@@ -20,7 +20,7 @@ import org.ioopm.calculator.ast.*;
 ///   - A subtree gets parentheses if its priority is LOWER than its parent's.
 ///   - The RIGHT subtree of - and / also gets them if the priority is EQUAL,
 ///     because a - (b - c) is not the same as a - b - c.
-public class Test {
+public class TestCreateExpression {
     private static int passed = 0;
     private static int failed = 0;
 

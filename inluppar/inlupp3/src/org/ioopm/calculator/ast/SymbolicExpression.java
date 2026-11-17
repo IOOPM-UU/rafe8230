@@ -1,7 +1,5 @@
 package org.ioopm.calculator.ast;
 
-import java.util.HashMap;
-
 import org.ioopm.calculator.parser.Environment;
 
 public abstract class SymbolicExpression {
@@ -10,9 +8,9 @@ public abstract class SymbolicExpression {
     public SymbolicExpression() {
         this.defaultPriority = 0; 
     }
-    public boolean isConstant() {
-        return false;
-    }
+
+    public boolean isConstant() { return false; }
+    public boolean isCommand() { return false;  }
 
 
     public String getName() {
