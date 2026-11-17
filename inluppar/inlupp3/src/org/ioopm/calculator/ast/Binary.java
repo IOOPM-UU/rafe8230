@@ -10,6 +10,13 @@ public abstract class Binary extends SymbolicExpression {
         this.rhs = rhs; 
     }
 
+    protected SymbolicExpression getLhs() {
+        return this.lhs; 
+    }
+    protected SymbolicExpression getRhs() {
+        return this.rhs; 
+    }
+
     public String toString() {
         String s = "";  
         if (this.getPriority() > this.lhs.getPriority()) {
