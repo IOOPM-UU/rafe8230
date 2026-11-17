@@ -1,5 +1,7 @@
 package org.ioopm.calculator.ast;
 
+import org.ioopm.calculator.parser.Environment;
+
 public class Negation extends Unary {
     public Negation(SymbolicExpression arg) {
         super(arg);
@@ -17,8 +19,8 @@ public class Negation extends Unary {
         return "-" + this.getArg();
     }
 
-    public SymbolicExpression eval() {
-        SymbolicExpression arg = this.getArg().eval();
+    public SymbolicExpression eval(Environment vars) {
+        SymbolicExpression arg = this.getArg().eval(vars);
         if (arg.isConstant()) {
             return new Constant(arg.getValue() * -1); 
         }

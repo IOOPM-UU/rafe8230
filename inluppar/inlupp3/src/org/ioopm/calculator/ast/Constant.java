@@ -1,5 +1,7 @@
 package org.ioopm.calculator.ast;
 
+import org.ioopm.calculator.parser.Environment;
+
 public class Constant extends Atom {
     private double value; 
     public Constant(double value) {
@@ -28,7 +30,7 @@ public class Constant extends Atom {
     }
     
     @Override 
-    public SymbolicExpression eval() {
+    public SymbolicExpression eval(Environment vars) {
         return new Constant(value); 
     }
 }

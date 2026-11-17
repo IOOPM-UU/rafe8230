@@ -1,5 +1,7 @@
 package org.ioopm.calculator.ast;
 
+import org.ioopm.calculator.parser.Environment;
+
 public class Assignment extends Binary {
 
     public Assignment(SymbolicExpression lhs, SymbolicExpression rhs) {
@@ -18,7 +20,9 @@ public class Assignment extends Binary {
         return super.toString(); 
     }
 
-    public SymbolicExpression eval() {
-        return getLhs().eval(); 
+    public SymbolicExpression eval(Environment vars) {
+        SymbolicExpression value = this.getLhs().eval(vars); 
+        vars.put((Variable) this.getRhs(), value); 
+        return value; 
     }
 }

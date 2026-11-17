@@ -1,5 +1,9 @@
 package org.ioopm.calculator.ast;
 
+import java.util.HashMap;
+
+import org.ioopm.calculator.parser.Environment;
+
 public abstract class SymbolicExpression {
     private int defaultPriority;
     
@@ -9,6 +13,7 @@ public abstract class SymbolicExpression {
     public boolean isConstant() {
         return false;
     }
+
 
     public String getName() {
         throw new RuntimeException("getName() called on expression with no operator");  
@@ -23,5 +28,5 @@ public abstract class SymbolicExpression {
         throw new RuntimeException("getValue called on non constant"); 
     }
 
-    public abstract SymbolicExpression eval(); 
+    public abstract SymbolicExpression eval(Environment vars); 
 }

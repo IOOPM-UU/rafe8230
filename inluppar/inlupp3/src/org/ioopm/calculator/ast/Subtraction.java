@@ -1,5 +1,7 @@
 package org.ioopm.calculator.ast;
 
+import org.ioopm.calculator.parser.Environment;
+
 public class Subtraction extends Binary {
     public Subtraction(SymbolicExpression lhs, SymbolicExpression rhs) {
         super(lhs, rhs); 
@@ -19,9 +21,9 @@ public class Subtraction extends Binary {
     }
 
     @Override 
-    public SymbolicExpression eval() {
-        SymbolicExpression lArg = this.getLhs().eval();  
-        SymbolicExpression rArg = this.getRhs().eval(); 
+    public SymbolicExpression eval(Environment vars) {
+        SymbolicExpression lArg = this.getLhs().eval(vars);  
+        SymbolicExpression rArg = this.getRhs().eval(vars); 
 
         if (lArg.isConstant() && rArg.isConstant()) {
             double result = lArg.getValue() - rArg.getValue(); 

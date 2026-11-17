@@ -1,5 +1,9 @@
 package org.ioopm.calculator.ast;
 
+import java.util.HashMap;
+
+import org.ioopm.calculator.parser.Environment;
+
 public class Addition extends Binary { 
     public Addition(SymbolicExpression lhs, SymbolicExpression rhs) {
         super(lhs, rhs); 
@@ -17,14 +21,14 @@ public class Addition extends Binary {
     
 
     @Override 
-    public SymbolicExpression eval() {
-        SymbolicExpression lArg = this.getLhs().eval();  
-        SymbolicExpression rArg = this.getRhs().eval(); 
+    public SymbolicExpression eval(Environment vars) {
+        SymbolicExpression lArg = this.getLhs().eval(vars);  
+        SymbolicExpression rArg = this.getRhs().eval(vars); 
 
         if (lArg.isConstant() && rArg.isConstant()) {
             return new Constant(lArg.getValue() + rArg.getValue());
         } 
-        return new Addition(lArg, rArg); 
+       return new Addition(lArg, rArg); 
     }
 
     public boolean equals(Object other) {

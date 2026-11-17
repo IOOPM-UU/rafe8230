@@ -1,5 +1,7 @@
 package org.ioopm.calculator.ast;
 
+import org.ioopm.calculator.parser.Environment;
+
 public class Log extends Unary {
     public Log(SymbolicExpression arg) {
         super(arg);
@@ -13,8 +15,8 @@ public class Log extends Unary {
         return super.toString();
     }
     @Override 
-    public SymbolicExpression eval() {
-        SymbolicExpression arg = this.getArg().eval(); 
+    public SymbolicExpression eval(Environment vars) {
+        SymbolicExpression arg = this.getArg().eval(vars); 
         if (arg.isConstant()) {
             return new Constant(Math.log(arg.getValue())); 
         } else {

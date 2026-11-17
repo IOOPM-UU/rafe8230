@@ -1,5 +1,7 @@
 package org.ioopm.calculator.ast;
 
+import org.ioopm.calculator.parser.Environment;
+
 public class Sin extends Unary {
     public Sin(SymbolicExpression arg) {
         super(arg); 
@@ -12,8 +14,8 @@ public class Sin extends Unary {
     }
 
     @Override 
-    public SymbolicExpression eval() {
-        SymbolicExpression arg = this.getArg().eval(); 
+    public SymbolicExpression eval(Environment vars) {
+        SymbolicExpression arg = this.getArg().eval(vars); 
         if (arg.isConstant()) {
             return new Constant(Math.sin(arg.getValue())); 
         } else {

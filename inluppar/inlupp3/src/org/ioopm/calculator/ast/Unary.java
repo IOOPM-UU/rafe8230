@@ -1,4 +1,8 @@
-package org.ioopm.calculator.ast; 
+package org.ioopm.calculator.ast;
+
+import java.util.HashMap;
+
+import org.ioopm.calculator.parser.Environment;
 
 public abstract class Unary extends SymbolicExpression {
     private SymbolicExpression arg; /// Some argument
@@ -23,8 +27,8 @@ public abstract class Unary extends SymbolicExpression {
         return s + this.arg;
     }
 
-    public SymbolicExpression eval() {
-        return this.arg.eval(); 
+    public SymbolicExpression eval(Environment vars) {
+        return this.arg.eval(vars); 
     }
     
 }
