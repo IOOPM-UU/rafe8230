@@ -1,10 +1,8 @@
 package org.ioopm.calculator.parser;
 
-import java.io.IOException;
-
-public class IllegalExpressionException extends IOException{
+public class IllegalExpressionException extends RuntimeException{
     public IllegalExpressionException(String msg) {
-        System.out.println(msg);
+        super(msg); 
     }
     
 }
