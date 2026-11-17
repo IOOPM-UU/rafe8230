@@ -1,5 +1,8 @@
-import java.util.*;
+package org.ioopm.calculator.parser;
 
-public class Environment extends HashMap<Variable, SymbolicExpression> {
+import java.util.HashMap;
 
-}
+import org.ioopm.calculator.ast.SymbolicExpression;
+import org.ioopm.calculator.ast.Variable;
+
+public class Environment extends HashMap<Variable, SymbolicExpression>{}
