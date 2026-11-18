@@ -42,6 +42,10 @@ inlupp1/
 
 ## Build
 
+// Severity 1: Moved compilation comments to README
+// gcc -S -O0 -I. linked_list/linked_list.c -o nopt.s     # literal translation
+// gcc -S -O2 -I. linked_list/linked_list.c -o opt.s      # optimised
+
 ```bash
 make              # compiles all files including tests and frec_count
 make clean        # removes all binaries and generated files

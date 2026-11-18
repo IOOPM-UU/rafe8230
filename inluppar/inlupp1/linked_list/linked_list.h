@@ -4,19 +4,18 @@
 #include "common.h"
 
 /**
-* @file linked_list.h
-* @author Rasmus Ferngren
-* @date 17 sep 2026
-* @brief A linked list library
-*
-* Each entry is a list containing a value and a pointer to the next index of said list
-*/
+ * @file linked_list.h
+ * @author Rasmus Ferngren
+ * @date 17 sep 2026
+ * @brief A linked list library
+ *
+ * Each entry is a list containing a value and a pointer to the next index of said list
+ */
 
 
-
-typedef struct list ioopm_list_t; /// Meta: struct definition goes in C file
-
-typedef struct list_entry list_entry_t; 
+ //Severity 1: Comment saying struct is in c-file, but its in _private.h
+typedef struct list ioopm_list_t; 
+typedef struct list_entry ioopm_list_entry_t; //Severity 1: missing "ioopm"
 
 /// @brief Creates a new empty list
 /// @return an empty linked list
@@ -53,7 +52,7 @@ elem_t ioopm_list_last(const ioopm_list_t *list);
 /// @pre 0 <= index <= length(list)
 /// @param list the linked list that will be extended
 /// @param index the position in the list
-/// @param value the value to be inserted 
+/// @param value the value to be inserted
 void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value);
 
 /// @brief Remove an element from a linked list in O(n) time.

@@ -19,7 +19,8 @@ void process_word(elem_t word, ioopm_hash_table_t *ht)
   {
     freq.i += 1;
     ioopm_hash_table_insert(ht, word, freq);
-  } else
+  }
+  else
   {
     ioopm_hash_table_insert(ht, string_elem(strdup(word.s)), int_elem(1));
   }
@@ -64,7 +65,6 @@ struct freq_word
   size_t freq;
 };
 
-
 /// @brief Compare the frequency of two freq_words through pointers to them
 /// @param p1 the first freq_word
 /// @param p2 the second freq_word
@@ -94,8 +94,6 @@ void sort_freq_words(struct freq_word words[], size_t no_words)
   qsort(words, no_words, sizeof(struct freq_word), cmp_freq_words_reverse);
 }
 
-
-
 int main(int argc, char *argv[])
 {
   // Check arguments
@@ -117,37 +115,37 @@ int main(int argc, char *argv[])
     process_file(argv[i], ht);
   }
 
-  // Create an array where each index contains a word and its frequency 
+  // Create an array where each index contains a word and its frequency
   size_t size = ioopm_hash_table_size(ht);
   struct freq_word freq_words[size];
 
   // Iterate over hash table to dump its words and
   // frequencies into the array above
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
-  int i = 0;
+  size_t i = 0; //Severity 1: here i was an in, later it is size_t.
   while (!ioopm_hash_table_iterator_at_end(it))
   {
-    size_t value = ioopm_hash_table_iterator_current_value(it).u; 
-    elem_t word = ioopm_hash_table_iterator_current_key(it); 
-    
+    size_t value = ioopm_hash_table_iterator_current_value(it).u;
+    elem_t word = ioopm_hash_table_iterator_current_key(it);
+
     // Place the value and word in the created array
     // The value is the freq of the word
-    freq_words[i].freq = value; 
-    freq_words[i].word = word.s; 
-    
+    freq_words[i].freq = value;
+    freq_words[i].word = word.s;
+
     i++;
     ioopm_hash_table_iterator_advance(it);
   }
-  
+
   sort_freq_words(freq_words, size);
 
   // Print the result of the sorted array
-  for (size_t i = 0; i < size; ++i)
+  for (size_t j = 0; j < size; ++j) //Severity 1: variable i was shadowed, changed to j.
   {
-    printf("%s: %zd\n", freq_words[i].word, freq_words[i].freq);
-    
+    printf("%s: %zd\n", freq_words[j].word, freq_words[j].freq);
+
     // Free the allocaded memory after print
-    free(freq_words[i].word); 
+    free(freq_words[j].word);
   }
 
   ioopm_hash_table_iterator_destroy(it);

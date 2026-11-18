@@ -4,26 +4,19 @@
 #include "common.h"
 
 /**
-* @file hash_table_iterator.h
-* @author Rasmus Ferngren
-* @date 7 sep 2026
-* @brief Simple hash table iterator
-*
-* Hash table iterators provide an interface to iterate through all entries in a hash table.
-* An iterator is either positioned at an entry, called the current entry, or it is positioned at-the-end, if it has already iterated through all entries.
-* If the underlying hash table of an iterator is modified using any non-iterator function, the iterator is invalidated and should not be used anymore.
-*
-*/
+ * @file hash_table_iterator.h
+ * @author Rasmus Ferngren
+ * @date 7 sep 2026
+ * @brief Simple hash table iterator
+ *
+ * Hash table iterators provide an interface to iterate through all entries in a hash table.
+ * An iterator is either positioned at an entry, called the current entry, or it is positioned at-the-end, if it has already iterated through all entries.
+ * If the underlying hash table of an iterator is modified using any non-iterator function, the iterator is invalidated and should not be used anymore.
+ *
+ */
 
 /// @brief hash table iterator struct
 typedef struct hash_table_iterator ioopm_hash_table_iterator_t;
-
-struct hash_table_iterator
-{
-  ioopm_hash_table_t *ht;
-  size_t current_bucket;
-  ioopm_entry_t *current_entry;
-};
 
 /// @brief Create an iterator for a hash table.
 /// @param ht hash table to iterate over

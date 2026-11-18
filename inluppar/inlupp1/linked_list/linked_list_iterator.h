@@ -5,13 +5,7 @@
 
 typedef struct list_iterator ioopm_list_iterator_t;
 
-struct list_iterator
-{
-  ioopm_list_t *list;
-  size_t index;
-  list_entry_t *current_entry;
-  list_entry_t *previous_entry;
-};
+
 
 /// @brief Create a new iterator
 /// @param l the list to iterate over
