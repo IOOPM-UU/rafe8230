@@ -3,12 +3,12 @@ package org.ioopm.calculator.ast;
 import org.ioopm.calculator.parser.Environment;
 
 public class Variable extends Atom {
-    private String identifier; 
+    private String identifier;
+
     public Variable(String identifier) {
         this.identifier = identifier;
     }
 
-    
     public String toString() {
         return this.identifier;
     }
@@ -22,19 +22,19 @@ public class Variable extends Atom {
     }
 
     public boolean equals(Variable other) {
-        return this.identifier.equals(other.identifier); 
+        return this.identifier.equals(other.identifier);
     }
 
-    @Override 
+    @Override
     public SymbolicExpression eval(Environment vars) {
         if (vars.containsKey(this)) {
-            return vars.get(this); 
+            return vars.get(this);
         }
-        return this; 
+        return this;
     }
 
-    @Override 
+    @Override
     public int hashCode() {
-        return this.identifier.hashCode(); 
+        return this.identifier.hashCode();
     }
 }
