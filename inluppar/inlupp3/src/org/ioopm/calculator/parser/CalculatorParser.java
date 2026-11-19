@@ -152,6 +152,10 @@ public class CalculatorParser {
     }
 
 
+
+
+
+
     /**
      * Checks wether the token read is an addition or subtraction
      * and then continue on with the right hand side of operator
